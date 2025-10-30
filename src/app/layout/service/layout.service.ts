@@ -1,7 +1,7 @@
 import { Injectable, effect, signal, computed } from '@angular/core';
 import { Subject } from 'rxjs';
 
-export interface layoutConfig {
+export interface LayoutConfig {
     preset?: string;
     primary?: string;
     surface?: string | undefined | null;
@@ -26,11 +26,11 @@ interface MenuChangeEvent {
     providedIn: 'root'
 })
 export class LayoutService {
-    _config: layoutConfig = {
-        preset: 'Aura',
+    _config: LayoutConfig = {
+        preset: 'Lara',
         primary: 'emerald',
         surface: null,
-        darkTheme: false,
+        darkTheme: true,
         menuMode: 'static'
     };
 
@@ -42,11 +42,11 @@ export class LayoutService {
         menuHoverActive: false
     };
 
-    layoutConfig = signal<layoutConfig>(this._config);
+    layoutConfig = signal<LayoutConfig>(this._config);
 
     layoutState = signal<LayoutState>(this._state);
 
-    private configUpdate = new Subject<layoutConfig>();
+    private configUpdate = new Subject<LayoutConfig>();
 
     private overlayOpen = new Subject<any>();
 
@@ -98,7 +98,7 @@ export class LayoutService {
         });
     }
 
-    private handleDarkModeTransition(config: layoutConfig): void {
+    private handleDarkModeTransition(config: LayoutConfig): void {
         if ((document as any).startViewTransition) {
             this.startViewTransition(config);
         } else {
@@ -107,7 +107,7 @@ export class LayoutService {
         }
     }
 
-    private startViewTransition(config: layoutConfig): void {
+    private startViewTransition(config: LayoutConfig): void {
         const transition = (document as any).startViewTransition(() => {
             this.toggleDarkMode(config);
         });
@@ -119,7 +119,7 @@ export class LayoutService {
             .catch(() => {});
     }
 
-    toggleDarkMode(config?: layoutConfig): void {
+    toggleDarkMode(config?: LayoutConfig): void {
         const _config = config || this.layoutConfig();
         if (_config.darkTheme) {
             document.documentElement.classList.add('app-dark');
