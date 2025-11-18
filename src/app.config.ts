@@ -9,8 +9,10 @@ import { appReducers, metaReducers } from './store/app/app.reducers';
 import { appRoutes } from './app.routes';
 import { provideApollo } from 'apollo-angular';
 import { HttpLink } from 'apollo-angular/http';
-import { InMemoryCache } from '@apollo/client/core';
+import { ApolloLink, CombinedGraphQLErrors, CombinedProtocolErrors, InMemoryCache } from '@apollo/client/core';
 import { environment } from './environments/environment';
+import { ErrorLink } from '@apollo/client/link/error';
+import { LoggerService } from '@/services/logger.service';
 
 export const appConfig: ApplicationConfig = {
     providers: [
@@ -18,9 +20,27 @@ export const appConfig: ApplicationConfig = {
         provideHttpClient(withFetch(), withInterceptorsFromDi()),
         provideRouter(appRoutes, withInMemoryScrolling({ anchorScrolling: 'enabled', scrollPositionRestoration: 'enabled' }), withEnabledBlockingInitialNavigation()),
         provideApollo(() => {
+            const loggerService = inject(LoggerService);
             const httpLink = inject(HttpLink);
+            const basicHttpLink = httpLink.create({
+                uri: environment.apiUrl,
+                withCredentials: true
+            });
+
+            const errorLink = new ErrorLink(({ error, operation }) => {
+                if (CombinedGraphQLErrors.is(error)) {
+                    error.errors.forEach(({ message, locations, path }) => loggerService.error(`[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`));
+                } else if (CombinedProtocolErrors.is(error)) {
+                    error.errors.forEach(({ message, extensions }) => loggerService.error(`[Protocol error]: Message: ${message}, Extensions: ${JSON.stringify(extensions)}`));
+                } else {
+                    loggerService.error(`[Network error]: ${error}`);
+                }
+            });
+
+            const link = ApolloLink.from([errorLink, basicHttpLink]);
+
             return {
-                link: httpLink.create({ uri: environment.apiUrl }),
+                link: link,
                 cache: new InMemoryCache()
             };
         }),

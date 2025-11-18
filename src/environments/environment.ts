@@ -1,4 +1,8 @@
 export const environment = {
     production: true,
-    apiUrl: 'https://graphql.nguyenbinh23011998.workers.dev/graphql'
+    // long live container,
+    // apiUrl: 'http://localhost:7989/graphql'
+
+    // worker
+    apiUrl: 'http://localhost:7979/graphql'
 };

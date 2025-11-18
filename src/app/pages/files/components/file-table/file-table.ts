@@ -3,9 +3,7 @@ import { CommonModule } from '@angular/common';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { RippleModule } from 'primeng/ripple';
-import { Product, ProductService } from '@/pages/service/product.service';
-import { UsersGQL } from '@/generated/graphql';
-import { tap } from 'rxjs';
+import { Product, ProductService } from '@/app/pages/service/product.service';
 
 @Component({
     selector: 'app-file-table',
@@ -17,14 +15,9 @@ import { tap } from 'rxjs';
 export class FileTable {
     products!: Product[];
 
-    constructor(
-        private productService: ProductService,
-        private readonly usersGQL: UsersGQL
-    ) {}
+    constructor(private productService: ProductService) {}
 
     ngOnInit() {
-        this.usersGQL.fetch().pipe(tap(console.log)).subscribe();
-
         this.productService.getProductsSmall().then((data) => (this.products = data));
     }
 }

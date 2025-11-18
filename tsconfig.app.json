@@ -7,9 +7,11 @@
         "types": []
     },
     "files": [
-        "src/main.ts"
+        "src/main.ts",
+        "src/environments/environment.ts"
     ],
     "include": [
-        "src/**/*.d.ts"
+        "src/**/*.d.ts",
+        "graphql/**/*.ts"
     ]
 }

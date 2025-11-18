@@ -65,7 +65,7 @@ export class AppMenu {
                             {
                                 label: 'Login',
                                 icon: 'pi pi-fw pi-sign-in',
-                                routerLink: ['/auth/login']
+                                routerLink: ['/auth/sign-in']
                             },
                             {
                                 label: 'Error',

@@ -17,42 +17,63 @@ export type Scalars = {
   Float: { input: number; output: number; }
 };
 
+/** Payload includes user and session id */
+export type AuthPayload = {
+  __typename?: 'AuthPayload';
+  /** Session ID */
+  sessionId: Scalars['String']['output'];
+  /** Authenticated user */
+  user?: Maybe<UserItem>;
+};
+
 export type FileCreatedAtFilters = {
   OR?: InputMaybe<Array<FileCreatedAtfiltersOr>>;
-  eq?: InputMaybe<Scalars['Int']['input']>;
-  gt?: InputMaybe<Scalars['Int']['input']>;
-  gte?: InputMaybe<Scalars['Int']['input']>;
+  /** Date */
+  eq?: InputMaybe<Scalars['String']['input']>;
+  /** Date */
+  gt?: InputMaybe<Scalars['String']['input']>;
+  /** Date */
+  gte?: InputMaybe<Scalars['String']['input']>;
   ilike?: InputMaybe<Scalars['String']['input']>;
-  /** Array<undefined> */
-  inArray?: InputMaybe<Array<Scalars['Int']['input']>>;
+  /** Array<Date> */
+  inArray?: InputMaybe<Array<Scalars['String']['input']>>;
   isNotNull?: InputMaybe<Scalars['Boolean']['input']>;
   isNull?: InputMaybe<Scalars['Boolean']['input']>;
   like?: InputMaybe<Scalars['String']['input']>;
-  lt?: InputMaybe<Scalars['Int']['input']>;
-  lte?: InputMaybe<Scalars['Int']['input']>;
-  ne?: InputMaybe<Scalars['Int']['input']>;
+  /** Date */
+  lt?: InputMaybe<Scalars['String']['input']>;
+  /** Date */
+  lte?: InputMaybe<Scalars['String']['input']>;
+  /** Date */
+  ne?: InputMaybe<Scalars['String']['input']>;
   notIlike?: InputMaybe<Scalars['String']['input']>;
-  /** Array<undefined> */
-  notInArray?: InputMaybe<Array<Scalars['Int']['input']>>;
+  /** Array<Date> */
+  notInArray?: InputMaybe<Array<Scalars['String']['input']>>;
   notLike?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type FileCreatedAtfiltersOr = {
-  eq?: InputMaybe<Scalars['Int']['input']>;
-  gt?: InputMaybe<Scalars['Int']['input']>;
-  gte?: InputMaybe<Scalars['Int']['input']>;
+  /** Date */
+  eq?: InputMaybe<Scalars['String']['input']>;
+  /** Date */
+  gt?: InputMaybe<Scalars['String']['input']>;
+  /** Date */
+  gte?: InputMaybe<Scalars['String']['input']>;
   ilike?: InputMaybe<Scalars['String']['input']>;
-  /** Array<undefined> */
-  inArray?: InputMaybe<Array<Scalars['Int']['input']>>;
+  /** Array<Date> */
+  inArray?: InputMaybe<Array<Scalars['String']['input']>>;
   isNotNull?: InputMaybe<Scalars['Boolean']['input']>;
   isNull?: InputMaybe<Scalars['Boolean']['input']>;
   like?: InputMaybe<Scalars['String']['input']>;
-  lt?: InputMaybe<Scalars['Int']['input']>;
-  lte?: InputMaybe<Scalars['Int']['input']>;
-  ne?: InputMaybe<Scalars['Int']['input']>;
+  /** Date */
+  lt?: InputMaybe<Scalars['String']['input']>;
+  /** Date */
+  lte?: InputMaybe<Scalars['String']['input']>;
+  /** Date */
+  ne?: InputMaybe<Scalars['String']['input']>;
   notIlike?: InputMaybe<Scalars['String']['input']>;
-  /** Array<undefined> */
-  notInArray?: InputMaybe<Array<Scalars['Int']['input']>>;
+  /** Array<Date> */
+  notInArray?: InputMaybe<Array<Scalars['String']['input']>>;
   notLike?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -175,14 +196,31 @@ export type FileImageMetadataRelationFileArgs = {
 
 export type FileImageMetadataRelationFileRelation = {
   __typename?: 'FileImageMetadataRelationFileRelation';
-  createdAt?: Maybe<Scalars['Int']['output']>;
+  /** Date */
+  createdAt?: Maybe<Scalars['String']['output']>;
   filename: Scalars['String']['output'];
   id: Scalars['String']['output'];
   mimetype?: Maybe<Scalars['String']['output']>;
   sizeBytes?: Maybe<Scalars['Int']['output']>;
   storageKey: Scalars['String']['output'];
   storageType: FileStorageTypeEnum;
-  updatedAt?: Maybe<Scalars['Int']['output']>;
+  /** Date */
+  updatedAt?: Maybe<Scalars['String']['output']>;
+  userId: Scalars['String']['output'];
+};
+
+export type FileItem = {
+  __typename?: 'FileItem';
+  /** Date */
+  createdAt?: Maybe<Scalars['String']['output']>;
+  filename: Scalars['String']['output'];
+  id: Scalars['String']['output'];
+  mimetype?: Maybe<Scalars['String']['output']>;
+  sizeBytes?: Maybe<Scalars['Int']['output']>;
+  storageKey: Scalars['String']['output'];
+  storageType: FileStorageTypeEnum;
+  /** Date */
+  updatedAt?: Maybe<Scalars['String']['output']>;
   userId: Scalars['String']['output'];
 };
 
@@ -239,7 +277,8 @@ export type FileOrderBy = {
 
 export type FileSelectItem = {
   __typename?: 'FileSelectItem';
-  createdAt?: Maybe<Scalars['Int']['output']>;
+  /** Date */
+  createdAt?: Maybe<Scalars['String']['output']>;
   filename: Scalars['String']['output'];
   id: Scalars['String']['output'];
   imageMetadata?: Maybe<FileImageMetadataRelation>;
@@ -247,7 +286,8 @@ export type FileSelectItem = {
   sizeBytes?: Maybe<Scalars['Int']['output']>;
   storageKey: Scalars['String']['output'];
   storageType: FileStorageTypeEnum;
-  updatedAt?: Maybe<Scalars['Int']['output']>;
+  /** Date */
+  updatedAt?: Maybe<Scalars['String']['output']>;
   user?: Maybe<FileUserRelation>;
   userId: Scalars['String']['output'];
   videoMetadata?: Maybe<FileVideoMetadataRelation>;
@@ -396,40 +436,52 @@ export type FileStorageTypefiltersOr = {
 
 export type FileUpdatedAtFilters = {
   OR?: InputMaybe<Array<FileUpdatedAtfiltersOr>>;
-  eq?: InputMaybe<Scalars['Int']['input']>;
-  gt?: InputMaybe<Scalars['Int']['input']>;
-  gte?: InputMaybe<Scalars['Int']['input']>;
+  /** Date */
+  eq?: InputMaybe<Scalars['String']['input']>;
+  /** Date */
+  gt?: InputMaybe<Scalars['String']['input']>;
+  /** Date */
+  gte?: InputMaybe<Scalars['String']['input']>;
   ilike?: InputMaybe<Scalars['String']['input']>;
-  /** Array<undefined> */
-  inArray?: InputMaybe<Array<Scalars['Int']['input']>>;
+  /** Array<Date> */
+  inArray?: InputMaybe<Array<Scalars['String']['input']>>;
   isNotNull?: InputMaybe<Scalars['Boolean']['input']>;
   isNull?: InputMaybe<Scalars['Boolean']['input']>;
   like?: InputMaybe<Scalars['String']['input']>;
-  lt?: InputMaybe<Scalars['Int']['input']>;
-  lte?: InputMaybe<Scalars['Int']['input']>;
-  ne?: InputMaybe<Scalars['Int']['input']>;
+  /** Date */
+  lt?: InputMaybe<Scalars['String']['input']>;
+  /** Date */
+  lte?: InputMaybe<Scalars['String']['input']>;
+  /** Date */
+  ne?: InputMaybe<Scalars['String']['input']>;
   notIlike?: InputMaybe<Scalars['String']['input']>;
-  /** Array<undefined> */
-  notInArray?: InputMaybe<Array<Scalars['Int']['input']>>;
+  /** Array<Date> */
+  notInArray?: InputMaybe<Array<Scalars['String']['input']>>;
   notLike?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type FileUpdatedAtfiltersOr = {
-  eq?: InputMaybe<Scalars['Int']['input']>;
-  gt?: InputMaybe<Scalars['Int']['input']>;
-  gte?: InputMaybe<Scalars['Int']['input']>;
+  /** Date */
+  eq?: InputMaybe<Scalars['String']['input']>;
+  /** Date */
+  gt?: InputMaybe<Scalars['String']['input']>;
+  /** Date */
+  gte?: InputMaybe<Scalars['String']['input']>;
   ilike?: InputMaybe<Scalars['String']['input']>;
-  /** Array<undefined> */
-  inArray?: InputMaybe<Array<Scalars['Int']['input']>>;
+  /** Array<Date> */
+  inArray?: InputMaybe<Array<Scalars['String']['input']>>;
   isNotNull?: InputMaybe<Scalars['Boolean']['input']>;
   isNull?: InputMaybe<Scalars['Boolean']['input']>;
   like?: InputMaybe<Scalars['String']['input']>;
-  lt?: InputMaybe<Scalars['Int']['input']>;
-  lte?: InputMaybe<Scalars['Int']['input']>;
-  ne?: InputMaybe<Scalars['Int']['input']>;
+  /** Date */
+  lt?: InputMaybe<Scalars['String']['input']>;
+  /** Date */
+  lte?: InputMaybe<Scalars['String']['input']>;
+  /** Date */
+  ne?: InputMaybe<Scalars['String']['input']>;
   notIlike?: InputMaybe<Scalars['String']['input']>;
-  /** Array<undefined> */
-  notInArray?: InputMaybe<Array<Scalars['Int']['input']>>;
+  /** Array<Date> */
+  notInArray?: InputMaybe<Array<Scalars['String']['input']>>;
   notLike?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -474,12 +526,16 @@ export type FileUserIdfiltersOr = {
 
 export type FileUserRelation = {
   __typename?: 'FileUserRelation';
-  createdAt?: Maybe<Scalars['Int']['output']>;
+  /** Date */
+  createdAt?: Maybe<Scalars['String']['output']>;
   email: Scalars['String']['output'];
   files: Array<FileUserRelationFilesRelation>;
+  firstName: Scalars['String']['output'];
   id: Scalars['String']['output'];
-  name: Scalars['String']['output'];
-  updatedAt?: Maybe<Scalars['Int']['output']>;
+  lastName: Scalars['String']['output'];
+  password: Scalars['String']['output'];
+  /** Date */
+  updatedAt?: Maybe<Scalars['String']['output']>;
 };
 
 
@@ -492,14 +548,16 @@ export type FileUserRelationFilesArgs = {
 
 export type FileUserRelationFilesRelation = {
   __typename?: 'FileUserRelationFilesRelation';
-  createdAt?: Maybe<Scalars['Int']['output']>;
+  /** Date */
+  createdAt?: Maybe<Scalars['String']['output']>;
   filename: Scalars['String']['output'];
   id: Scalars['String']['output'];
   mimetype?: Maybe<Scalars['String']['output']>;
   sizeBytes?: Maybe<Scalars['Int']['output']>;
   storageKey: Scalars['String']['output'];
   storageType: FileStorageTypeEnum;
-  updatedAt?: Maybe<Scalars['Int']['output']>;
+  /** Date */
+  updatedAt?: Maybe<Scalars['String']['output']>;
   userId: Scalars['String']['output'];
 };
 
@@ -522,14 +580,16 @@ export type FileVideoMetadataRelationFileArgs = {
 
 export type FileVideoMetadataRelationFileRelation = {
   __typename?: 'FileVideoMetadataRelationFileRelation';
-  createdAt?: Maybe<Scalars['Int']['output']>;
+  /** Date */
+  createdAt?: Maybe<Scalars['String']['output']>;
   filename: Scalars['String']['output'];
   id: Scalars['String']['output'];
   mimetype?: Maybe<Scalars['String']['output']>;
   sizeBytes?: Maybe<Scalars['Int']['output']>;
   storageKey: Scalars['String']['output'];
   storageType: FileStorageTypeEnum;
-  updatedAt?: Maybe<Scalars['Int']['output']>;
+  /** Date */
+  updatedAt?: Maybe<Scalars['String']['output']>;
   userId: Scalars['String']['output'];
 };
 
@@ -736,8 +796,22 @@ export type InnerOrder = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  /** Sign up a new user */
+  signIn: AuthPayload;
+  /** Sign up a new user */
+  signUp?: Maybe<UserItem>;
   /** Sync a batch of file metadata into the database. */
-  syncDriveFiles: Scalars['Int']['output'];
+  syncDriveFiles: Array<FileItem>;
+};
+
+
+export type MutationSignInArgs = {
+  data: SignInInput;
+};
+
+
+export type MutationSignUpArgs = {
+  data: SignUpInput;
 };
 
 
@@ -784,42 +858,74 @@ export type QueryVideoMetadataArgs = {
   where?: InputMaybe<VideoMetadataFilters>;
 };
 
+/** Input type for sign in */
+export type SignInInput = {
+  /** The user's email address. */
+  email: Scalars['String']['input'];
+  /** The user's password. */
+  password: Scalars['String']['input'];
+};
+
+/** Input type for register new user */
+export type SignUpInput = {
+  /** The user's email address (must be unique). */
+  email: Scalars['String']['input'];
+  /** The user's first name. */
+  firstName: Scalars['String']['input'];
+  /** The user's last name. */
+  lastName: Scalars['String']['input'];
+  /** The user's password (at least 8 characters recommended). */
+  password: Scalars['String']['input'];
+};
+
 export type UserCreatedAtFilters = {
   OR?: InputMaybe<Array<UserCreatedAtfiltersOr>>;
-  eq?: InputMaybe<Scalars['Int']['input']>;
-  gt?: InputMaybe<Scalars['Int']['input']>;
-  gte?: InputMaybe<Scalars['Int']['input']>;
+  /** Date */
+  eq?: InputMaybe<Scalars['String']['input']>;
+  /** Date */
+  gt?: InputMaybe<Scalars['String']['input']>;
+  /** Date */
+  gte?: InputMaybe<Scalars['String']['input']>;
   ilike?: InputMaybe<Scalars['String']['input']>;
-  /** Array<undefined> */
-  inArray?: InputMaybe<Array<Scalars['Int']['input']>>;
+  /** Array<Date> */
+  inArray?: InputMaybe<Array<Scalars['String']['input']>>;
   isNotNull?: InputMaybe<Scalars['Boolean']['input']>;
   isNull?: InputMaybe<Scalars['Boolean']['input']>;
   like?: InputMaybe<Scalars['String']['input']>;
-  lt?: InputMaybe<Scalars['Int']['input']>;
-  lte?: InputMaybe<Scalars['Int']['input']>;
-  ne?: InputMaybe<Scalars['Int']['input']>;
+  /** Date */
+  lt?: InputMaybe<Scalars['String']['input']>;
+  /** Date */
+  lte?: InputMaybe<Scalars['String']['input']>;
+  /** Date */
+  ne?: InputMaybe<Scalars['String']['input']>;
   notIlike?: InputMaybe<Scalars['String']['input']>;
-  /** Array<undefined> */
-  notInArray?: InputMaybe<Array<Scalars['Int']['input']>>;
+  /** Array<Date> */
+  notInArray?: InputMaybe<Array<Scalars['String']['input']>>;
   notLike?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type UserCreatedAtfiltersOr = {
-  eq?: InputMaybe<Scalars['Int']['input']>;
-  gt?: InputMaybe<Scalars['Int']['input']>;
-  gte?: InputMaybe<Scalars['Int']['input']>;
+  /** Date */
+  eq?: InputMaybe<Scalars['String']['input']>;
+  /** Date */
+  gt?: InputMaybe<Scalars['String']['input']>;
+  /** Date */
+  gte?: InputMaybe<Scalars['String']['input']>;
   ilike?: InputMaybe<Scalars['String']['input']>;
-  /** Array<undefined> */
-  inArray?: InputMaybe<Array<Scalars['Int']['input']>>;
+  /** Array<Date> */
+  inArray?: InputMaybe<Array<Scalars['String']['input']>>;
   isNotNull?: InputMaybe<Scalars['Boolean']['input']>;
   isNull?: InputMaybe<Scalars['Boolean']['input']>;
   like?: InputMaybe<Scalars['String']['input']>;
-  lt?: InputMaybe<Scalars['Int']['input']>;
-  lte?: InputMaybe<Scalars['Int']['input']>;
-  ne?: InputMaybe<Scalars['Int']['input']>;
+  /** Date */
+  lt?: InputMaybe<Scalars['String']['input']>;
+  /** Date */
+  lte?: InputMaybe<Scalars['String']['input']>;
+  /** Date */
+  ne?: InputMaybe<Scalars['String']['input']>;
   notIlike?: InputMaybe<Scalars['String']['input']>;
-  /** Array<undefined> */
-  notInArray?: InputMaybe<Array<Scalars['Int']['input']>>;
+  /** Array<Date> */
+  notInArray?: InputMaybe<Array<Scalars['String']['input']>>;
   notLike?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -864,7 +970,8 @@ export type UserEmailfiltersOr = {
 
 export type UserFilesRelation = {
   __typename?: 'UserFilesRelation';
-  createdAt?: Maybe<Scalars['Int']['output']>;
+  /** Date */
+  createdAt?: Maybe<Scalars['String']['output']>;
   filename: Scalars['String']['output'];
   id: Scalars['String']['output'];
   imageMetadata?: Maybe<UserFilesRelationImageMetadataRelation>;
@@ -872,7 +979,8 @@ export type UserFilesRelation = {
   sizeBytes?: Maybe<Scalars['Int']['output']>;
   storageKey: Scalars['String']['output'];
   storageType: FileStorageTypeEnum;
-  updatedAt?: Maybe<Scalars['Int']['output']>;
+  /** Date */
+  updatedAt?: Maybe<Scalars['String']['output']>;
   user?: Maybe<UserFilesRelationUserRelation>;
   userId: Scalars['String']['output'];
   videoMetadata?: Maybe<UserFilesRelationVideoMetadataRelation>;
@@ -909,24 +1017,30 @@ export type UserFilesRelationImageMetadataRelationFileArgs = {
 
 export type UserFilesRelationImageMetadataRelationFileRelation = {
   __typename?: 'UserFilesRelationImageMetadataRelationFileRelation';
-  createdAt?: Maybe<Scalars['Int']['output']>;
+  /** Date */
+  createdAt?: Maybe<Scalars['String']['output']>;
   filename: Scalars['String']['output'];
   id: Scalars['String']['output'];
   mimetype?: Maybe<Scalars['String']['output']>;
   sizeBytes?: Maybe<Scalars['Int']['output']>;
   storageKey: Scalars['String']['output'];
   storageType: FileStorageTypeEnum;
-  updatedAt?: Maybe<Scalars['Int']['output']>;
+  /** Date */
+  updatedAt?: Maybe<Scalars['String']['output']>;
   userId: Scalars['String']['output'];
 };
 
 export type UserFilesRelationUserRelation = {
   __typename?: 'UserFilesRelationUserRelation';
-  createdAt?: Maybe<Scalars['Int']['output']>;
+  /** Date */
+  createdAt?: Maybe<Scalars['String']['output']>;
   email: Scalars['String']['output'];
+  firstName: Scalars['String']['output'];
   id: Scalars['String']['output'];
-  name: Scalars['String']['output'];
-  updatedAt?: Maybe<Scalars['Int']['output']>;
+  lastName: Scalars['String']['output'];
+  password: Scalars['String']['output'];
+  /** Date */
+  updatedAt?: Maybe<Scalars['String']['output']>;
 };
 
 export type UserFilesRelationVideoMetadataRelation = {
@@ -948,14 +1062,16 @@ export type UserFilesRelationVideoMetadataRelationFileArgs = {
 
 export type UserFilesRelationVideoMetadataRelationFileRelation = {
   __typename?: 'UserFilesRelationVideoMetadataRelationFileRelation';
-  createdAt?: Maybe<Scalars['Int']['output']>;
+  /** Date */
+  createdAt?: Maybe<Scalars['String']['output']>;
   filename: Scalars['String']['output'];
   id: Scalars['String']['output'];
   mimetype?: Maybe<Scalars['String']['output']>;
   sizeBytes?: Maybe<Scalars['Int']['output']>;
   storageKey: Scalars['String']['output'];
   storageType: FileStorageTypeEnum;
-  updatedAt?: Maybe<Scalars['Int']['output']>;
+  /** Date */
+  updatedAt?: Maybe<Scalars['String']['output']>;
   userId: Scalars['String']['output'];
 };
 
@@ -963,17 +1079,60 @@ export type UserFilters = {
   OR?: InputMaybe<Array<UserFiltersOr>>;
   createdAt?: InputMaybe<UserCreatedAtFilters>;
   email?: InputMaybe<UserEmailFilters>;
+  firstName?: InputMaybe<UserFirstNameFilters>;
   id?: InputMaybe<UserIdFilters>;
-  name?: InputMaybe<UserNameFilters>;
+  lastName?: InputMaybe<UserLastNameFilters>;
+  password?: InputMaybe<UserPasswordFilters>;
   updatedAt?: InputMaybe<UserUpdatedAtFilters>;
 };
 
 export type UserFiltersOr = {
   createdAt?: InputMaybe<UserCreatedAtFilters>;
   email?: InputMaybe<UserEmailFilters>;
+  firstName?: InputMaybe<UserFirstNameFilters>;
   id?: InputMaybe<UserIdFilters>;
-  name?: InputMaybe<UserNameFilters>;
+  lastName?: InputMaybe<UserLastNameFilters>;
+  password?: InputMaybe<UserPasswordFilters>;
   updatedAt?: InputMaybe<UserUpdatedAtFilters>;
+};
+
+export type UserFirstNameFilters = {
+  OR?: InputMaybe<Array<UserFirstNamefiltersOr>>;
+  eq?: InputMaybe<Scalars['String']['input']>;
+  gt?: InputMaybe<Scalars['String']['input']>;
+  gte?: InputMaybe<Scalars['String']['input']>;
+  ilike?: InputMaybe<Scalars['String']['input']>;
+  /** Array<undefined> */
+  inArray?: InputMaybe<Array<Scalars['String']['input']>>;
+  isNotNull?: InputMaybe<Scalars['Boolean']['input']>;
+  isNull?: InputMaybe<Scalars['Boolean']['input']>;
+  like?: InputMaybe<Scalars['String']['input']>;
+  lt?: InputMaybe<Scalars['String']['input']>;
+  lte?: InputMaybe<Scalars['String']['input']>;
+  ne?: InputMaybe<Scalars['String']['input']>;
+  notIlike?: InputMaybe<Scalars['String']['input']>;
+  /** Array<undefined> */
+  notInArray?: InputMaybe<Array<Scalars['String']['input']>>;
+  notLike?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UserFirstNamefiltersOr = {
+  eq?: InputMaybe<Scalars['String']['input']>;
+  gt?: InputMaybe<Scalars['String']['input']>;
+  gte?: InputMaybe<Scalars['String']['input']>;
+  ilike?: InputMaybe<Scalars['String']['input']>;
+  /** Array<undefined> */
+  inArray?: InputMaybe<Array<Scalars['String']['input']>>;
+  isNotNull?: InputMaybe<Scalars['Boolean']['input']>;
+  isNull?: InputMaybe<Scalars['Boolean']['input']>;
+  like?: InputMaybe<Scalars['String']['input']>;
+  lt?: InputMaybe<Scalars['String']['input']>;
+  lte?: InputMaybe<Scalars['String']['input']>;
+  ne?: InputMaybe<Scalars['String']['input']>;
+  notIlike?: InputMaybe<Scalars['String']['input']>;
+  /** Array<undefined> */
+  notInArray?: InputMaybe<Array<Scalars['String']['input']>>;
+  notLike?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type UserIdFilters = {
@@ -1015,8 +1174,21 @@ export type UserIdfiltersOr = {
   notLike?: InputMaybe<Scalars['String']['input']>;
 };
 
-export type UserNameFilters = {
-  OR?: InputMaybe<Array<UserNamefiltersOr>>;
+export type UserItem = {
+  __typename?: 'UserItem';
+  /** Date */
+  createdAt?: Maybe<Scalars['String']['output']>;
+  email: Scalars['String']['output'];
+  firstName: Scalars['String']['output'];
+  id: Scalars['String']['output'];
+  lastName: Scalars['String']['output'];
+  password: Scalars['String']['output'];
+  /** Date */
+  updatedAt?: Maybe<Scalars['String']['output']>;
+};
+
+export type UserLastNameFilters = {
+  OR?: InputMaybe<Array<UserLastNamefiltersOr>>;
   eq?: InputMaybe<Scalars['String']['input']>;
   gt?: InputMaybe<Scalars['String']['input']>;
   gte?: InputMaybe<Scalars['String']['input']>;
@@ -1035,7 +1207,7 @@ export type UserNameFilters = {
   notLike?: InputMaybe<Scalars['String']['input']>;
 };
 
-export type UserNamefiltersOr = {
+export type UserLastNamefiltersOr = {
   eq?: InputMaybe<Scalars['String']['input']>;
   gt?: InputMaybe<Scalars['String']['input']>;
   gte?: InputMaybe<Scalars['String']['input']>;
@@ -1057,19 +1229,64 @@ export type UserNamefiltersOr = {
 export type UserOrderBy = {
   createdAt?: InputMaybe<InnerOrder>;
   email?: InputMaybe<InnerOrder>;
+  firstName?: InputMaybe<InnerOrder>;
   id?: InputMaybe<InnerOrder>;
-  name?: InputMaybe<InnerOrder>;
+  lastName?: InputMaybe<InnerOrder>;
+  password?: InputMaybe<InnerOrder>;
   updatedAt?: InputMaybe<InnerOrder>;
+};
+
+export type UserPasswordFilters = {
+  OR?: InputMaybe<Array<UserPasswordfiltersOr>>;
+  eq?: InputMaybe<Scalars['String']['input']>;
+  gt?: InputMaybe<Scalars['String']['input']>;
+  gte?: InputMaybe<Scalars['String']['input']>;
+  ilike?: InputMaybe<Scalars['String']['input']>;
+  /** Array<undefined> */
+  inArray?: InputMaybe<Array<Scalars['String']['input']>>;
+  isNotNull?: InputMaybe<Scalars['Boolean']['input']>;
+  isNull?: InputMaybe<Scalars['Boolean']['input']>;
+  like?: InputMaybe<Scalars['String']['input']>;
+  lt?: InputMaybe<Scalars['String']['input']>;
+  lte?: InputMaybe<Scalars['String']['input']>;
+  ne?: InputMaybe<Scalars['String']['input']>;
+  notIlike?: InputMaybe<Scalars['String']['input']>;
+  /** Array<undefined> */
+  notInArray?: InputMaybe<Array<Scalars['String']['input']>>;
+  notLike?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UserPasswordfiltersOr = {
+  eq?: InputMaybe<Scalars['String']['input']>;
+  gt?: InputMaybe<Scalars['String']['input']>;
+  gte?: InputMaybe<Scalars['String']['input']>;
+  ilike?: InputMaybe<Scalars['String']['input']>;
+  /** Array<undefined> */
+  inArray?: InputMaybe<Array<Scalars['String']['input']>>;
+  isNotNull?: InputMaybe<Scalars['Boolean']['input']>;
+  isNull?: InputMaybe<Scalars['Boolean']['input']>;
+  like?: InputMaybe<Scalars['String']['input']>;
+  lt?: InputMaybe<Scalars['String']['input']>;
+  lte?: InputMaybe<Scalars['String']['input']>;
+  ne?: InputMaybe<Scalars['String']['input']>;
+  notIlike?: InputMaybe<Scalars['String']['input']>;
+  /** Array<undefined> */
+  notInArray?: InputMaybe<Array<Scalars['String']['input']>>;
+  notLike?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type UserSelectItem = {
   __typename?: 'UserSelectItem';
-  createdAt?: Maybe<Scalars['Int']['output']>;
+  /** Date */
+  createdAt?: Maybe<Scalars['String']['output']>;
   email: Scalars['String']['output'];
   files: Array<UserFilesRelation>;
+  firstName: Scalars['String']['output'];
   id: Scalars['String']['output'];
-  name: Scalars['String']['output'];
-  updatedAt?: Maybe<Scalars['Int']['output']>;
+  lastName: Scalars['String']['output'];
+  password: Scalars['String']['output'];
+  /** Date */
+  updatedAt?: Maybe<Scalars['String']['output']>;
 };
 
 
@@ -1082,40 +1299,52 @@ export type UserSelectItemFilesArgs = {
 
 export type UserUpdatedAtFilters = {
   OR?: InputMaybe<Array<UserUpdatedAtfiltersOr>>;
-  eq?: InputMaybe<Scalars['Int']['input']>;
-  gt?: InputMaybe<Scalars['Int']['input']>;
-  gte?: InputMaybe<Scalars['Int']['input']>;
+  /** Date */
+  eq?: InputMaybe<Scalars['String']['input']>;
+  /** Date */
+  gt?: InputMaybe<Scalars['String']['input']>;
+  /** Date */
+  gte?: InputMaybe<Scalars['String']['input']>;
   ilike?: InputMaybe<Scalars['String']['input']>;
-  /** Array<undefined> */
-  inArray?: InputMaybe<Array<Scalars['Int']['input']>>;
+  /** Array<Date> */
+  inArray?: InputMaybe<Array<Scalars['String']['input']>>;
   isNotNull?: InputMaybe<Scalars['Boolean']['input']>;
   isNull?: InputMaybe<Scalars['Boolean']['input']>;
   like?: InputMaybe<Scalars['String']['input']>;
-  lt?: InputMaybe<Scalars['Int']['input']>;
-  lte?: InputMaybe<Scalars['Int']['input']>;
-  ne?: InputMaybe<Scalars['Int']['input']>;
+  /** Date */
+  lt?: InputMaybe<Scalars['String']['input']>;
+  /** Date */
+  lte?: InputMaybe<Scalars['String']['input']>;
+  /** Date */
+  ne?: InputMaybe<Scalars['String']['input']>;
   notIlike?: InputMaybe<Scalars['String']['input']>;
-  /** Array<undefined> */
-  notInArray?: InputMaybe<Array<Scalars['Int']['input']>>;
+  /** Array<Date> */
+  notInArray?: InputMaybe<Array<Scalars['String']['input']>>;
   notLike?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type UserUpdatedAtfiltersOr = {
-  eq?: InputMaybe<Scalars['Int']['input']>;
-  gt?: InputMaybe<Scalars['Int']['input']>;
-  gte?: InputMaybe<Scalars['Int']['input']>;
+  /** Date */
+  eq?: InputMaybe<Scalars['String']['input']>;
+  /** Date */
+  gt?: InputMaybe<Scalars['String']['input']>;
+  /** Date */
+  gte?: InputMaybe<Scalars['String']['input']>;
   ilike?: InputMaybe<Scalars['String']['input']>;
-  /** Array<undefined> */
-  inArray?: InputMaybe<Array<Scalars['Int']['input']>>;
+  /** Array<Date> */
+  inArray?: InputMaybe<Array<Scalars['String']['input']>>;
   isNotNull?: InputMaybe<Scalars['Boolean']['input']>;
   isNull?: InputMaybe<Scalars['Boolean']['input']>;
   like?: InputMaybe<Scalars['String']['input']>;
-  lt?: InputMaybe<Scalars['Int']['input']>;
-  lte?: InputMaybe<Scalars['Int']['input']>;
-  ne?: InputMaybe<Scalars['Int']['input']>;
+  /** Date */
+  lt?: InputMaybe<Scalars['String']['input']>;
+  /** Date */
+  lte?: InputMaybe<Scalars['String']['input']>;
+  /** Date */
+  ne?: InputMaybe<Scalars['String']['input']>;
   notIlike?: InputMaybe<Scalars['String']['input']>;
-  /** Array<undefined> */
-  notInArray?: InputMaybe<Array<Scalars['Int']['input']>>;
+  /** Array<Date> */
+  notInArray?: InputMaybe<Array<Scalars['String']['input']>>;
   notLike?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -1238,7 +1467,8 @@ export type VideoMetadataFileIdfiltersOr = {
 
 export type VideoMetadataFileRelation = {
   __typename?: 'VideoMetadataFileRelation';
-  createdAt?: Maybe<Scalars['Int']['output']>;
+  /** Date */
+  createdAt?: Maybe<Scalars['String']['output']>;
   filename: Scalars['String']['output'];
   id: Scalars['String']['output'];
   imageMetadata?: Maybe<VideoMetadataFileRelationImageMetadataRelation>;
@@ -1246,7 +1476,8 @@ export type VideoMetadataFileRelation = {
   sizeBytes?: Maybe<Scalars['Int']['output']>;
   storageKey: Scalars['String']['output'];
   storageType: FileStorageTypeEnum;
-  updatedAt?: Maybe<Scalars['Int']['output']>;
+  /** Date */
+  updatedAt?: Maybe<Scalars['String']['output']>;
   user?: Maybe<VideoMetadataFileRelationUserRelation>;
   userId: Scalars['String']['output'];
   videoMetadata?: Maybe<VideoMetadataFileRelationVideoMetadataRelation>;
@@ -1283,25 +1514,31 @@ export type VideoMetadataFileRelationImageMetadataRelationFileArgs = {
 
 export type VideoMetadataFileRelationImageMetadataRelationFileRelation = {
   __typename?: 'VideoMetadataFileRelationImageMetadataRelationFileRelation';
-  createdAt?: Maybe<Scalars['Int']['output']>;
+  /** Date */
+  createdAt?: Maybe<Scalars['String']['output']>;
   filename: Scalars['String']['output'];
   id: Scalars['String']['output'];
   mimetype?: Maybe<Scalars['String']['output']>;
   sizeBytes?: Maybe<Scalars['Int']['output']>;
   storageKey: Scalars['String']['output'];
   storageType: FileStorageTypeEnum;
-  updatedAt?: Maybe<Scalars['Int']['output']>;
+  /** Date */
+  updatedAt?: Maybe<Scalars['String']['output']>;
   userId: Scalars['String']['output'];
 };
 
 export type VideoMetadataFileRelationUserRelation = {
   __typename?: 'VideoMetadataFileRelationUserRelation';
-  createdAt?: Maybe<Scalars['Int']['output']>;
+  /** Date */
+  createdAt?: Maybe<Scalars['String']['output']>;
   email: Scalars['String']['output'];
   files: Array<VideoMetadataFileRelationUserRelationFilesRelation>;
+  firstName: Scalars['String']['output'];
   id: Scalars['String']['output'];
-  name: Scalars['String']['output'];
-  updatedAt?: Maybe<Scalars['Int']['output']>;
+  lastName: Scalars['String']['output'];
+  password: Scalars['String']['output'];
+  /** Date */
+  updatedAt?: Maybe<Scalars['String']['output']>;
 };
 
 
@@ -1314,14 +1551,16 @@ export type VideoMetadataFileRelationUserRelationFilesArgs = {
 
 export type VideoMetadataFileRelationUserRelationFilesRelation = {
   __typename?: 'VideoMetadataFileRelationUserRelationFilesRelation';
-  createdAt?: Maybe<Scalars['Int']['output']>;
+  /** Date */
+  createdAt?: Maybe<Scalars['String']['output']>;
   filename: Scalars['String']['output'];
   id: Scalars['String']['output'];
   mimetype?: Maybe<Scalars['String']['output']>;
   sizeBytes?: Maybe<Scalars['Int']['output']>;
   storageKey: Scalars['String']['output'];
   storageType: FileStorageTypeEnum;
-  updatedAt?: Maybe<Scalars['Int']['output']>;
+  /** Date */
+  updatedAt?: Maybe<Scalars['String']['output']>;
   userId: Scalars['String']['output'];
 };
 
@@ -1540,24 +1779,104 @@ export type VideoMetadataWidthfiltersOr = {
   notLike?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type UserSelectItemFragment = { __typename?: 'UserSelectItem', id: string, email: string, lastName: string, firstName: string };
+
+export type UserItemFragment = { __typename?: 'UserItem', id: string, email: string, lastName: string, firstName: string };
+
+export type AuthPayloadFragment = { __typename?: 'AuthPayload', sessionId: string, user?: { __typename?: 'UserItem', id: string, email: string, lastName: string, firstName: string } | null };
+
 export type UsersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type UsersQuery = { __typename?: 'Query', users: Array<{ __typename?: 'UserSelectItem', id: string }> };
+export type UsersQuery = { __typename?: 'Query', users: Array<{ __typename?: 'UserSelectItem', id: string, email: string, lastName: string, firstName: string }> };
 
+export type SignUpMutationVariables = Exact<{
+  data: SignUpInput;
+}>;
+
+
+export type SignUpMutation = { __typename?: 'Mutation', signUp?: { __typename?: 'UserItem', id: string, email: string, lastName: string, firstName: string } | null };
+
+export type SignInMutationVariables = Exact<{
+  data: SignInInput;
+}>;
+
+
+export type SignInMutation = { __typename?: 'Mutation', signIn: { __typename?: 'AuthPayload', sessionId: string, user?: { __typename?: 'UserItem', id: string, email: string, lastName: string, firstName: string } | null } };
+
+export const UserSelectItemFragmentDoc = gql`
+    fragment UserSelectItem on UserSelectItem {
+  id
+  email
+  lastName
+  firstName
+}
+    `;
+export const UserItemFragmentDoc = gql`
+    fragment UserItem on UserItem {
+  id
+  email
+  lastName
+  firstName
+}
+    `;
+export const AuthPayloadFragmentDoc = gql`
+    fragment AuthPayload on AuthPayload {
+  user {
+    ...UserItem
+  }
+  sessionId
+}
+    ${UserItemFragmentDoc}`;
 export const UsersDocument = gql`
     query Users {
   users {
-    id
+    ...UserSelectItem
   }
 }
-    `;
+    ${UserSelectItemFragmentDoc}`;
 
   @Injectable({
     providedIn: 'root'
   })
   export class UsersGQL extends Apollo.Query<UsersQuery, UsersQueryVariables> {
     document = UsersDocument;
+    
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
+export const SignUpDocument = gql`
+    mutation SignUp($data: SignUpInput!) {
+  signUp(data: $data) {
+    ...UserItem
+  }
+}
+    ${UserItemFragmentDoc}`;
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class SignUpGQL extends Apollo.Mutation<SignUpMutation, SignUpMutationVariables> {
+    document = SignUpDocument;
+    
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
+export const SignInDocument = gql`
+    mutation SignIn($data: SignInInput!) {
+  signIn(data: $data) {
+    ...AuthPayload
+  }
+}
+    ${AuthPayloadFragmentDoc}`;
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class SignInGQL extends Apollo.Mutation<SignInMutation, SignInMutationVariables> {
+    document = SignInDocument;
     
     constructor(apollo: Apollo.Apollo) {
       super(apollo);

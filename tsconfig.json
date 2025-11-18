@@ -3,6 +3,10 @@
 {
     "compileOnSave": false,
     "compilerOptions": {
+        "types": [
+            "nodes",
+            "google.accounts"
+        ],
         "outDir": "./dist/out-tsc",
         "strict": true,
         "noImplicitOverride": true,
@@ -19,8 +23,11 @@
         "module": "ES2022",
         "baseUrl": "./",
         "paths": {
+            "@generated/*": [
+                "graphql/*"
+            ],
             "@/*": [
-                "src/app/*"
+                "src/*"
             ]
         }
     },

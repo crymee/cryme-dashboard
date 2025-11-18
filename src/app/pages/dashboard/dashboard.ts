@@ -4,7 +4,7 @@ import { StatsWidget } from './components/statswidget';
 import { RecentSalesWidget } from './components/recentsaleswidget';
 import { BestSellingWidget } from './components/bestsellingwidget';
 import { RevenueStreamWidget } from './components/revenuestreamwidget';
-import { FileTable } from '@/pages/files/components/file-table/file-table';
+import { FileTable } from '@/app/pages/files/components/file-table/file-table';
 
 @Component({
     selector: 'app-dashboard',
