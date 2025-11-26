@@ -29,7 +29,8 @@
               {
                 "glob": "**/*",
                 "input": "public"
-              }
+              },
+              "src/service-worker.js"
             ],
             "styles": [
               "src/assets/styles.scss"
@@ -82,7 +83,8 @@
               {
                 "glob": "**/*",
                 "input": "public"
-              }
+              },
+              "src/service-worker.js"
             ],
             "styles": [
               "src/assets/styles.scss"

@@ -14,6 +14,7 @@ import { catchError, EMPTY, finalize, from, switchMap } from 'rxjs';
 import { LoggerService } from '@/services/logger.service';
 import { SIGN_IN_FORM_PROVIDER, SignInForm } from '@/app/pages/auth/form';
 import { AuthService } from '@/app/services/auth.service';
+import { PusherBeamsService } from '@/app/services/push-beams.service';
 
 @Component({
     selector: 'app-sign-in',
@@ -91,7 +92,8 @@ export class SignIn {
         private readonly signInGQL: SignInGQL,
         private readonly router: Router,
         private readonly authService: AuthService,
-        private readonly loggerService: LoggerService
+        private readonly loggerService: LoggerService,
+        private readonly pusherBeamsService: PusherBeamsService
     ) {
         this.authService.initializeGoogleAuth();
     }
@@ -117,11 +119,18 @@ export class SignIn {
                 variables: { data: this.form.getRawValue() }
             })
             .pipe(
-                switchMap((res) => {
-                    const user = res.data?.signIn;
+                switchMap(async (res) => {
+                    const payload = res.data?.signIn;
 
-                    if (user) {
-                        this.loggerService.info(user);
+                    if (payload?.user) {
+                        try {
+                            await this.pusherBeamsService.setAuthenticatedUser(payload.user.id);
+                        } catch (e) {
+                            this.loggerService.error(e);
+                        }
+
+                        this.loggerService.info(payload.user);
+
                         return from(this.router.navigate(['/']));
                     }
 

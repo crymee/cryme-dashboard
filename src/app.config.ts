@@ -23,7 +23,7 @@ export const appConfig: ApplicationConfig = {
             const loggerService = inject(LoggerService);
             const httpLink = inject(HttpLink);
             const basicHttpLink = httpLink.create({
-                uri: environment.apiUrl,
+                uri: environment.schemaUrl,
                 withCredentials: true
             });
 

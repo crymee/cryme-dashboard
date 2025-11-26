@@ -1,4 +1,7 @@
 export const environment = {
-    production: false,
-    apiUrl: 'https://graphql.nguyenbinh23011998.workers.dev/graphql'
-};
+    production: true,
+    // apiUrl: 'https://graphql-prod.nguyenbinh23011998.workers.dev',
+    apiUrl: 'https://graphql-prod.nguyenbinh23011998.workers.dev/app',
+    // schemaUrl: 'https://graphql-prod.nguyenbinh23011998.workers.dev/graphql',
+    schemaUrl: 'https://graphql-prod.nguyenbinh23011998.workers.dev/app/graphql'
+} as const;
