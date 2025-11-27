@@ -5,9 +5,9 @@ export const environment = {
     // schemaUrl: 'http://localhost:8787/graphql'
 
     // worker
-    // apiUrl: 'http://localhost:7979',
-    // schemaUrl: 'http://localhost:7979/graphql'
+    apiUrl: 'http://localhost:7979',
+    schemaUrl: 'http://localhost:7979/graphql'
 
-    apiUrl: 'https://graphql-prod.nguyenbinh23011998.workers.dev/app',
-    schemaUrl: 'https://graphql-prod.nguyenbinh23011998.workers.dev/app/graphql'
+    // apiUrl: 'https://graphql-prod.nguyenbinh23011998.workers.dev/app',
+    // schemaUrl: 'https://graphql-prod.nguyenbinh23011998.workers.dev/app/graphql'
 } as const;
