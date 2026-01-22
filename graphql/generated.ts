@@ -593,6 +593,12 @@ export type FileVideoMetadataRelationFileRelation = {
   userId: Scalars['String']['output'];
 };
 
+/** Input type for forgot password */
+export type ForgotPasswordInput = {
+  /** The user's email address. */
+  email: Scalars['String']['input'];
+};
+
 /** Input type for bulk ingesting file metadata from Google Drive. */
 export type GoogleDriveFileInput = {
   /** ISO 8601 timestamp for creation. */
@@ -796,12 +802,28 @@ export type InnerOrder = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  /** Sign up a new user */
+  /** Request a password reset link */
+  forgotPassword: Scalars['String']['output'];
+  /** Sign out a user */
+  logout: Scalars['String']['output'];
+  /** Reset password with token */
+  resetPassword: Scalars['String']['output'];
+  /** Sign in a user */
   signIn: AuthPayload;
-  /** Sign up a new user */
+  /** Sign up... */
   signUp?: Maybe<UserItem>;
   /** Sync a batch of file metadata into the database. */
   syncDriveFiles: Array<FileItem>;
+};
+
+
+export type MutationForgotPasswordArgs = {
+  data: ForgotPasswordInput;
+};
+
+
+export type MutationResetPasswordArgs = {
+  data: ResetPasswordInput;
 };
 
 
@@ -830,6 +852,8 @@ export enum OrderDirection {
 export type Query = {
   __typename?: 'Query';
   files: Array<FileSelectItem>;
+  /** Get current authenticated user */
+  me?: Maybe<UserItem>;
   users: Array<UserSelectItem>;
   videoMetadata: Array<VideoMetadataSelectItem>;
 };
@@ -856,6 +880,14 @@ export type QueryVideoMetadataArgs = {
   offset?: InputMaybe<Scalars['Int']['input']>;
   orderBy?: InputMaybe<VideoMetadataOrderBy>;
   where?: InputMaybe<VideoMetadataFilters>;
+};
+
+/** Input type for reset password */
+export type ResetPasswordInput = {
+  /** New password. */
+  password: Scalars['String']['input'];
+  /** Password reset token. */
+  token: Scalars['String']['input'];
 };
 
 /** Input type for sign in */
@@ -1790,6 +1822,11 @@ export type UsersQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type UsersQuery = { __typename?: 'Query', users: Array<{ __typename?: 'UserSelectItem', id: string, email: string, lastName: string, firstName: string }> };
 
+export type MeQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'UserItem', id: string, email: string, lastName: string, firstName: string } | null };
+
 export type SignUpMutationVariables = Exact<{
   data: SignUpInput;
 }>;
@@ -1803,6 +1840,25 @@ export type SignInMutationVariables = Exact<{
 
 
 export type SignInMutation = { __typename?: 'Mutation', signIn: { __typename?: 'AuthPayload', sessionId: string, user?: { __typename?: 'UserItem', id: string, email: string, lastName: string, firstName: string } | null } };
+
+export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type LogoutMutation = { __typename?: 'Mutation', logout: string };
+
+export type ForgotPasswordMutationVariables = Exact<{
+  data: ForgotPasswordInput;
+}>;
+
+
+export type ForgotPasswordMutation = { __typename?: 'Mutation', forgotPassword: string };
+
+export type ResetPasswordMutationVariables = Exact<{
+  data: ResetPasswordInput;
+}>;
+
+
+export type ResetPasswordMutation = { __typename?: 'Mutation', resetPassword: string };
 
 export const UserSelectItemFragmentDoc = gql`
     fragment UserSelectItem on UserSelectItem {
@@ -1846,13 +1902,37 @@ export const UsersDocument = gql`
       super(apollo);
     }
   }
+export const MeDocument = gql`
+    query Me {
+  me {
+    id
+    email
+    lastName
+    firstName
+  }
+}
+    `;
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class MeGQL extends Apollo.Query<MeQuery, MeQueryVariables> {
+    document = MeDocument;
+    
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
 export const SignUpDocument = gql`
     mutation SignUp($data: SignUpInput!) {
   signUp(data: $data) {
-    ...UserItem
+    id
+    email
+    lastName
+    firstName
   }
 }
-    ${UserItemFragmentDoc}`;
+    `;
 
   @Injectable({
     providedIn: 'root'
@@ -1867,16 +1947,70 @@ export const SignUpDocument = gql`
 export const SignInDocument = gql`
     mutation SignIn($data: SignInInput!) {
   signIn(data: $data) {
-    ...AuthPayload
+    user {
+      id
+      email
+      lastName
+      firstName
+    }
+    sessionId
   }
 }
-    ${AuthPayloadFragmentDoc}`;
+    `;
 
   @Injectable({
     providedIn: 'root'
   })
   export class SignInGQL extends Apollo.Mutation<SignInMutation, SignInMutationVariables> {
     document = SignInDocument;
+    
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
+export const LogoutDocument = gql`
+    mutation Logout {
+  logout
+}
+    `;
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class LogoutGQL extends Apollo.Mutation<LogoutMutation, LogoutMutationVariables> {
+    document = LogoutDocument;
+    
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
+export const ForgotPasswordDocument = gql`
+    mutation ForgotPassword($data: ForgotPasswordInput!) {
+  forgotPassword(data: $data)
+}
+    `;
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class ForgotPasswordGQL extends Apollo.Mutation<ForgotPasswordMutation, ForgotPasswordMutationVariables> {
+    document = ForgotPasswordDocument;
+    
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
+export const ResetPasswordDocument = gql`
+    mutation ResetPassword($data: ResetPasswordInput!) {
+  resetPassword(data: $data)
+}
+    `;
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class ResetPasswordGQL extends Apollo.Mutation<ResetPasswordMutation, ResetPasswordMutationVariables> {
+    document = ResetPasswordDocument;
     
     constructor(apollo: Apollo.Apollo) {
       super(apollo);

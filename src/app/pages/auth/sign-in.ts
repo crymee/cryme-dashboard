@@ -23,18 +23,18 @@ import { PusherBeamsService } from '@/app/services/push-beams.service';
     template: `
         <app-floating-configurator />
         <div class="bg-surface-50 dark:bg-surface-950 flex items-center justify-center min-h-screen min-w-screen overflow-hidden">
-            <div class="flex flex-col items-center justify-center">
+            <div class="flex flex-col items-center justify-center w-full max-w-lg">
                 <div style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%)">
-                    <div class="w-full bg-surface-0 dark:bg-surface-900 py-20 px-8 sm:px-20" style="border-radius: 53px">
+                    <div class="w-full min-w-[350px] bg-surface-0 dark:bg-surface-900 py-10 px-8 sm:px-12" style="border-radius: 53px">
                         <div class="text-center mb-8">
                             <svg viewBox="0 0 54 40" fill="none" xmlns="http://www.w3.org/2000/svg" class="mb-8 w-16 shrink-0 mx-auto"></svg>
                             <div class="text-surface-900 dark:text-surface-0 text-3xl font-medium mb-4">Cryme</div>
                             <span class="text-muted-color font-medium">Sign in to continue</span>
                         </div>
 
-                        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+                        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="w-full min-w-[300px]">
                             <label for="email" class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">Email</label>
-                            <input pInputText id="email" type="text" placeholder="Email address" class="w-full md:w-120 mb-4" formControlName="email" />
+                            <input pInputText id="email" type="email" placeholder="Email address" class="w-full min-w-[300px] mb-4" formControlName="email" autocomplete="email" />
 
                             @if (email.invalid && (email.dirty || email.touched)) {
                                 @if (email.errors?.['required']) {
@@ -51,7 +51,7 @@ import { PusherBeamsService } from '@/app/services/push-beams.service';
 
                             <label for="password" class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2">Password</label>
 
-                            <p-password id="password" formControlName="password" placeholder="Password" [toggleMask]="true" [fluid]="true" [feedback]="false" styleClass="mb-4"></p-password>
+                            <p-password id="password" formControlName="password" placeholder="Password" [toggleMask]="true" [fluid]="true" [feedback]="false" styleClass="mb-4" autocomplete="new-password"></p-password>
 
                             @if (password.invalid && (password.dirty || password.touched)) {
                                 @if (password.errors?.['required']) {
@@ -63,7 +63,7 @@ import { PusherBeamsService } from '@/app/services/push-beams.service';
 
                             <div class="flex items-center justify-between mt-2 mb-8 gap-8">
                                 <a class="font-medium no-underline text-right cursor-pointer text-primary" routerLink="/auth/sign-up">Don't have an account? Sign up</a>
-                                <a class="font-medium no-underline ml-2 text-right cursor-pointer text-primary">Forgot password?</a>
+                                <a class="font-medium no-underline ml-2 text-right cursor-pointer text-primary" routerLink="/auth/forgot-password">Forgot password?</a>
                             </div>
 
                             @if (form.errors?.['api']) {
@@ -75,8 +75,6 @@ import { PusherBeamsService } from '@/app/services/push-beams.service';
                             }
 
                             <p-button icon="pi pi-sign-in" [loading]="loading()" label="Sign In" styleClass="w-full mt-2" type="submit" [disabled]="form.invalid"></p-button>
-
-                            <p-button icon="pi pi-google" [loading]="loading()" (click)="signInWithGoogle()" label="Google" styleClass="w-full mt-2" type="button" severity="secondary"></p-button>
                         </form>
                     </div>
                 </div>
@@ -94,9 +92,7 @@ export class SignIn {
         private readonly authService: AuthService,
         private readonly loggerService: LoggerService,
         private readonly pusherBeamsService: PusherBeamsService
-    ) {
-        this.authService.initializeGoogleAuth();
-    }
+    ) {}
 
     get email() {
         return this.form.controls.email;
@@ -129,6 +125,7 @@ export class SignIn {
                             this.loggerService.error(e);
                         }
 
+                        this.authService.setUser(payload.user, payload.sessionId);
                         this.loggerService.info(payload.user);
 
                         return from(this.router.navigate(['/']));
@@ -146,10 +143,6 @@ export class SignIn {
                 })
             )
             .subscribe();
-    }
-
-    signInWithGoogle() {
-        this.authService.promptLogin();
     }
 
     protected readonly Object = Object;

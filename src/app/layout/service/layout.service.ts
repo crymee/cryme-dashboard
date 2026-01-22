@@ -22,16 +22,34 @@ interface MenuChangeEvent {
     routeEvent?: boolean;
 }
 
+const STORAGE_KEY = 'layout-config';
+
 @Injectable({
     providedIn: 'root'
 })
 export class LayoutService {
+    private getStoredConfig(): LayoutConfig {
+        try {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            return stored ? JSON.parse(stored) : {};
+        } catch {
+            return {};
+        }
+    }
+
+    private storeConfig(config: LayoutConfig): void {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
+        } catch {}
+    }
+
     _config: LayoutConfig = {
         preset: 'Lara',
         primary: 'emerald',
         surface: null,
         darkTheme: true,
-        menuMode: 'static'
+        menuMode: 'static',
+        ...this.getStoredConfig()
     };
 
     _state: LayoutState = {
@@ -89,8 +107,11 @@ export class LayoutService {
         effect(() => {
             const config = this.layoutConfig();
 
-            if (!this.initialized || !config) {
+            if (!config) return;
+
+            if (!this.initialized) {
                 this.initialized = true;
+                this.toggleDarkMode(config);
                 return;
             }
 
@@ -165,6 +186,7 @@ export class LayoutService {
 
     onConfigUpdate() {
         this._config = { ...this.layoutConfig() };
+        this.storeConfig(this._config);
         this.configUpdate.next(this.layoutConfig());
     }
 

@@ -3,21 +3,20 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FileTable } from './file-table';
 
 describe('FileTable', () => {
-  let component: FileTable;
-  let fixture: ComponentFixture<FileTable>;
+    let component: FileTable;
+    let fixture: ComponentFixture<FileTable>;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [FileTable]
-    })
-    .compileComponents();
+    beforeEach(async () => {
+        await TestBed.configureTestingModule({
+            imports: [FileTable]
+        }).compileComponents();
 
-    fixture = TestBed.createComponent(FileTable);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+        fixture = TestBed.createComponent(FileTable);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
+    });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+    it('should create', () => {
+        expect(component).toBeTruthy();
+    });
 });

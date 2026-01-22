@@ -16,6 +16,35 @@
     }
 }
 
+/* Animations */
+.animate-scalein {
+    animation: scalein 0.15s ease-out;
+}
+
+.animate-fadeout {
+    animation: fadeout 0.15s ease-out;
+}
+
+@keyframes scalein {
+    from {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeout {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
 .p-toast {
     &.p-toast-top-right,
     &.p-toast-top-left,

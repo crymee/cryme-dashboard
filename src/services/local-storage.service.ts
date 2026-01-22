@@ -1,10 +1,18 @@
-import * as localforage from 'localforage';
+import localforage from 'localforage';
 import { Injectable } from '@angular/core';
 
 @Injectable({
     providedIn: 'root'
 })
-export class LocalStorageService implements LocalForageDbMethodsCore {
+export class LocalForageService implements LocalForageDbMethodsCore {
+    constructor() {
+        localforage.config({
+            name: 'cryme-dashboard',
+            storeName: 'cryme-storage',
+            driver: localforage.INDEXEDDB
+        });
+    }
+
     getItem<T>(key: string, callback?: (err: any, value: T | null) => void): Promise<T | null> {
         return localforage.getItem(key, callback);
     }

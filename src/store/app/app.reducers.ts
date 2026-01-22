@@ -21,12 +21,11 @@ export const initialState: RootState = {
 export function localStorageSyncReducer(reducer: ActionReducer<RootState>) {
     return localStorageSync({
         keys: ['app'],
-        rehydrate: true,
-        storage: sessionStorage
+        rehydrate: true
     })(reducer);
 }
 
-export const metaReducers = [localStorageSyncReducer]; // This is now correctly typed as a synchronous ActionReducer factory
+export const metaReducers = [localStorageSyncReducer];
 
 export const appReducers = createReducer(
     initialAppState,

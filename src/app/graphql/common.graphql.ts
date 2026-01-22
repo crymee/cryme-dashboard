@@ -25,6 +25,7 @@ export const AUTH_PAYLOAD_FRAGMENT = gql`
         }
         sessionId
     }
+    ${USER_ITEM_FRAGMENT}
 `;
 
 export const USERS_QUERY = gql`
@@ -33,12 +34,27 @@ export const USERS_QUERY = gql`
             ...UserSelectItem
         }
     }
+    ${USER_SELECT_ITEM_FRAGMENT}
+`;
+
+export const ME_QUERY = gql`
+    query Me {
+        me {
+            id
+            email
+            lastName
+            firstName
+        }
+    }
 `;
 
 export const SIGN_UP_MUTATION = gql`
     mutation SignUp($data: SignUpInput!) {
         signUp(data: $data) {
-            ...UserItem
+            id
+            email
+            lastName
+            firstName
         }
     }
 `;
@@ -46,7 +62,31 @@ export const SIGN_UP_MUTATION = gql`
 export const SIGN_IN_MUTATION = gql`
     mutation SignIn($data: SignInInput!) {
         signIn(data: $data) {
-            ...AuthPayload
+            user {
+                id
+                email
+                lastName
+                firstName
+            }
+            sessionId
         }
+    }
+`;
+
+export const LOGOUT_MUTATION = gql`
+    mutation Logout {
+        logout
+    }
+`;
+
+export const FORGOT_PASSWORD_MUTATION = gql`
+    mutation ForgotPassword($data: ForgotPasswordInput!) {
+        forgotPassword(data: $data)
+    }
+`;
+
+export const RESET_PASSWORD_MUTATION = gql`
+    mutation ResetPassword($data: ResetPasswordInput!) {
+        resetPassword(data: $data)
     }
 `;

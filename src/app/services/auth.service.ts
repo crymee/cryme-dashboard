@@ -1,94 +1,98 @@
-import { Injectable, NgZone } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { Router } from '@angular/router';
+import { Apollo } from 'apollo-angular';
+import { LOGOUT_MUTATION, ME_QUERY } from '@/app/graphql/common.graphql';
+import { firstValueFrom } from 'rxjs';
+import { LocalForageService } from '@/services/local-storage.service';
 
-export type User = {};
+export interface User {
+    id: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+}
+
+export interface AuthData {
+    user: User;
+    sessionId: string;
+}
 
 @Injectable({
     providedIn: 'root'
 })
 export class AuthService {
-    private _token = new BehaviorSubject<string | null>(null);
     private _user = new BehaviorSubject<User | null>(null);
 
-    public token$ = this._token.asObservable();
     public user$ = this._user.asObservable();
     public isAuthenticated$ = new BehaviorSubject<boolean>(false);
 
-    private GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com';
+    private authChecked: Promise<void>;
 
     constructor(
         private router: Router,
-        private ngZone: NgZone
+        private apollo: Apollo,
+        private localStorage: LocalForageService
     ) {
-        // Kiểm tra xem có token trong localStorage khi tải lại trang không
-        const token = localStorage.getItem('google_token');
+        this.authChecked = this.checkAuth();
+    }
 
-        if (token) {
-            this.setToken(token);
+    private async checkAuth() {
+        try {
+            const storedUser = await this.localStorage.getItem<User>('user');
+            if (storedUser) {
+                this._user.next(storedUser);
+                this.isAuthenticated$.next(true);
+            }
+
+            try {
+                const result = await firstValueFrom(this.apollo.query<{ me: User }>({ query: ME_QUERY }));
+                if (result.data?.me) {
+                    this._user.next(result.data.me);
+                    this.isAuthenticated$.next(true);
+                    await this.localStorage.setItem('user', result.data.me);
+                }
+            } catch (apiError) {
+                if (!storedUser) {
+                    this._user.next(null);
+                    this.isAuthenticated$.next(false);
+                }
+            }
+        } catch (e) {
+            this._user.next(null);
+            this.isAuthenticated$.next(false);
         }
     }
 
-    public initializeGoogleAuth() {
-        // if (typeof google === 'undefined') {
-        //     console.error('Google script chưa tải xong');
-        //     return;
-        // }
-        // google.accounts.id.initialize({
-        //     client_id: this.GOOGLE_CLIENT_ID,
-        //     callback: async (response: any) => {
-        //         await this.ngZone.run(async () => {
-        //             await this.handleCredentialResponse(response);
-        //         });
-        //     }
-        // });
-    }
-
-    public promptLogin() {
-        // if (typeof google === 'undefined') {
-        //     console.error('Google script chưa tải xong');
-        //     return;
-        // }
-        // Hiển thị popup "One Tap"
-        // google.accounts.id.prompt();
-    }
-
-    private async handleCredentialResponse(response: any) {
-        const token = response.credential; // Đây là cái JWT (ID Token)
-        this.setToken(token);
-        await this.router.navigate(['/']); // Chuyển về trang chủ
-    }
-
-    private setToken(token: string) {
-        localStorage.setItem('google_token', token); // Lưu vào localStorage
-        this._token.next(token);
-
-        // const decoded: User = jwtDecode(token);
-        const decoded: User = {};
-        this._user.next(decoded);
+    public setUser(user: User, sessionId?: string) {
+        this._user.next(user);
         this.isAuthenticated$.next(true);
+        this.localStorage.setItem('user', user);
+        if (sessionId) {
+            this.localStorage.setItem('sessionId', sessionId);
+        }
     }
 
-    // 4. Xử lý đăng xuất
-    public logout() {
-        // if (typeof google === 'undefined') {
-        //     console.error('Google script chưa tải xong');
-        //     return;
-        // }
-
-        // Tắt chế độ tự động đăng nhập (One Tap)
-        // google.accounts.id.disableAutoSelect();
-
-        // Xóa token khỏi bộ nhớ
-        localStorage.removeItem('google_token');
-        this._token.next(null);
-        this._user.next(null);
-        this.isAuthenticated$.next(false);
-        this.router.navigate(['/']);
+    public async logout() {
+        try {
+            await firstValueFrom(this.apollo.mutate({ mutation: LOGOUT_MUTATION }));
+        } catch (e) {
+            console.error('Logout error:', e);
+        } finally {
+            this._user.next(null);
+            this.isAuthenticated$.next(false);
+            this.apollo.client.resetStore();
+            await this.localStorage.removeItem('user');
+            await this.localStorage.removeItem('sessionId');
+            await this.router.navigate(['/auth/sign-in']);
+        }
     }
 
-    // 5. Hàm trợ giúp để lấy token (cho Interceptor)
-    public getToken(): string | null {
-        return this._token.getValue();
+    public getUser(): User | null {
+        return this._user.getValue();
+    }
+
+    public async waitForAuthCheck(): Promise<void> {
+        await this.authChecked;
     }
 }
