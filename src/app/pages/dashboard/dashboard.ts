@@ -10,7 +10,7 @@ import { FileTable } from '@/app/pages/files/components/file-table/file-table';
     selector: 'app-dashboard',
     imports: [StatsWidget, RecentSalesWidget, BestSellingWidget, RevenueStreamWidget, NotificationsWidget, FileTable],
     template: `
-        <div class="grid grid-cols-12 gap-8">
+        <div class="grid grid-cols-12 gap-8 animate-fade-in-up">
             <app-stats-widget class="contents" />
             <div class="col-span-12 xl:col-span-6">
                 <app-file-table></app-file-table>
@@ -24,4 +24,4 @@ import { FileTable } from '@/app/pages/files/components/file-table/file-table';
         </div>
     `
 })
-export class Dashboard {}
+export class Dashboard { }

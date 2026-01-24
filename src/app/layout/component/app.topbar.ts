@@ -7,13 +7,14 @@ import { StyleClassModule } from 'primeng/styleclass';
 import { AppConfigurator } from './app.configurator';
 import { LayoutService } from '../service/layout.service';
 import { AuthService } from '@/app/services/auth.service';
+import { NotificationCenterComponent } from '@/app/components/notification-center/notification-center.component';
 import { MenuModule } from 'primeng/menu';
 import { Menu } from 'primeng/menu';
 
 @Component({
     selector: 'app-topbar',
     standalone: true,
-    imports: [RouterModule, CommonModule, StyleClassModule, AppConfigurator, MenuModule],
+    imports: [RouterModule, CommonModule, StyleClassModule, AppConfigurator, MenuModule, NotificationCenterComponent],
     template: ` <div class="layout-topbar">
         <div class="layout-topbar-logo-container">
             <button class="layout-menu-button layout-topbar-action" (click)="layoutService.onMenuToggle()">
@@ -26,6 +27,7 @@ import { Menu } from 'primeng/menu';
 
         <div class="layout-topbar-actions">
             <div class="layout-config-menu">
+                <app-notification-center></app-notification-center>
                 <button type="button" class="layout-topbar-action" (click)="toggleDarkMode()">
                     <i [ngClass]="{ 'pi ': true, 'pi-moon': layoutService.isDarkTheme(), 'pi-sun': !layoutService.isDarkTheme() }"></i>
                 </button>
@@ -116,5 +118,5 @@ export class AppTopbar {
         this.layoutService.layoutConfig.update((state) => ({ ...state, darkTheme: !state.darkTheme }));
     }
 
-    openConfigurator() {}
+    openConfigurator() { }
 }

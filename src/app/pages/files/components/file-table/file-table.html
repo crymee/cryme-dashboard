@@ -1,30 +1,47 @@
+<div class="mb-8">
+    <app-file-upload (onUploadComplete)="onUploadComplete()"></app-file-upload>
+</div>
+
 <div class="card mb-8!">
     <div class="font-semibold text-xl mb-4">Files</div>
-    <p-table [value]="products" [paginator]="true" [rows]="5" responsiveLayout="scroll">
+    <p-table [value]="loading ? skeletonRows : files" [paginator]="true" [rows]="10" responsiveLayout="scroll">
         <ng-template #header>
             <tr>
-                <th>Image</th>
-                <th pSortableColumn="name">
+                <th pSortableColumn="filename" style="width: 40%">
                     Name
-                    <p-sortIcon field="name"></p-sortIcon>
+                    <p-sortIcon field="filename"></p-sortIcon>
                 </th>
-                <th pSortableColumn="price">
-                    Price
-                    <p-sortIcon field="price"></p-sortIcon>
+                <th pSortableColumn="mimetype" style="width: 20%">
+                    Type
+                    <p-sortIcon field="mimetype"></p-sortIcon>
                 </th>
-                <th>View</th>
+                <th pSortableColumn="sizeBytes" style="width: 15%">
+                    Size
+                    <p-sortIcon field="sizeBytes"></p-sortIcon>
+                </th>
+                <th pSortableColumn="createdAt" style="width: 25%">
+                    Date
+                    <p-sortIcon field="createdAt"></p-sortIcon>
+                </th>
             </tr>
         </ng-template>
-        <ng-template #body let-product>
-            <tr>
-                <td style="width: 15%; min-width: 5rem">
-                    <img src="https://primefaces.org/cdn/primevue/images/product/{{ product.image }}" class="shadow-lg" alt="{{ product.name }}" width="50" />
+        <ng-template #body let-file>
+            <tr *ngIf="!loading">
+                <td class="flex items-center gap-3">
+                    <i [class]="getFileIcon(file.mimetype)" class="text-xl text-primary-500"></i>
+                    <span class="font-medium">{{ file.filename }}</span>
                 </td>
-                <td style="width: 35%; min-width: 7rem">{{ product.name }}</td>
-                <td style="width: 35%; min-width: 8rem">{{ product.price | currency: 'USD' }}</td>
-                <td style="width: 15%">
-                    <button pButton pRipple type="button" icon="pi pi-search" class="p-button p-component p-button-text p-button-icon-only"></button>
+                <td>
+                    <p-tag [value]="file.mimetype || 'Unknown'" severity="info" class="text-[10px]"></p-tag>
                 </td>
+                <td>{{ (file.sizeBytes / 1024 / 1024) | number:'1.2-2' }} MB</td>
+                <td>{{ file.createdAt | date:'medium' }}</td>
+            </tr>
+            <tr *ngIf="loading">
+                <td><p-skeleton width="80%"></p-skeleton></td>
+                <td><p-skeleton width="60%"></p-skeleton></td>
+                <td><p-skeleton width="40%"></p-skeleton></td>
+                <td><p-skeleton width="60%"></p-skeleton></td>
             </tr>
         </ng-template>
     </p-table>

@@ -48,6 +48,7 @@ export const ME_QUERY = gql`
             firstName
             twoFactorEnabled
             twoFactorMethod
+            currentSessionId
         }
     }
 `;
@@ -178,5 +179,94 @@ export const TWO_FACTOR_STATUS_QUERY = gql`
             emailEnabled
             hasBackupCodes
         }
+    }
+`;
+
+export const ACTIVE_SESSIONS_QUERY = gql`
+    query ActiveSessions {
+        activeSessions {
+            id
+            ipAddress
+            userAgent
+            location
+            lastActive
+            createdAt
+            expiresAt
+        }
+    }
+`;
+
+export const REVOKE_SESSION_MUTATION = gql`
+    mutation RevokeSession($id: ID!) {
+        revokeSession(id: $id)
+    }
+`;
+
+export const WEBHOOKS_QUERY = gql`
+    query Webhooks {
+        webhooks {
+            id
+            url
+            secret
+            isActive
+            events
+            createdAt
+        }
+    }
+`;
+
+export const REGISTER_WEBHOOK_MUTATION = gql`
+    mutation RegisterWebhook($url: String!, $events: [String!]!) {
+        registerWebhook(url: $url, events: $events) {
+            id
+            url
+            secret
+            isActive
+            events
+            createdAt
+        }
+    }
+`;
+
+export const DELETE_WEBHOOK_MUTATION = gql`
+    mutation DeleteWebhook($id: ID!) {
+        deleteWebhook(id: $id)
+    }
+`;
+export const FILES_QUERY = gql`
+    query Files {
+        files {
+            id
+            filename
+            mimetype
+            sizeBytes
+            storageType
+            createdAt
+        }
+    }
+`;
+export const NOTIFICATIONS_QUERY = gql`
+    query Notifications {
+        notifications {
+            id
+            title
+            message
+            type
+            isRead
+            link
+            createdAt
+        }
+    }
+`;
+
+export const MARK_NOTIFICATION_AS_READ_MUTATION = gql`
+    mutation MarkNotificationAsRead($id: ID!) {
+        markNotificationAsRead(id: $id)
+    }
+`;
+
+export const MARK_ALL_NOTIFICATIONS_AS_READ_MUTATION = gql`
+    mutation MarkAllNotificationsAsRead {
+        markAllNotificationsAsRead
     }
 `;

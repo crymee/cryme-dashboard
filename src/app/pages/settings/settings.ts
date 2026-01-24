@@ -1,10 +1,12 @@
 import { Component } from '@angular/core';
 import { TwoFactorSetupComponent } from '@/app/components/two-factor-setup/two-factor-setup.component';
+import { SessionManagementComponent } from '@/app/components/session-management/session-management.component';
+import { WebhookManagementComponent } from '@/app/components/webhook-management/webhook-management.component';
 
 @Component({
     selector: 'app-settings',
     standalone: true,
-    imports: [TwoFactorSetupComponent],
+    imports: [TwoFactorSetupComponent, SessionManagementComponent, WebhookManagementComponent],
     template: `
         <div class="max-w-3xl mx-auto">
             <div class="mb-6">
@@ -30,7 +32,21 @@ import { TwoFactorSetupComponent } from '@/app/components/two-factor-setup/two-f
                     <app-two-factor-setup></app-two-factor-setup>
                 </div>
             </div>
+
+            <!-- Sessions Section -->
+            <div class="mt-8 bg-surface-0 dark:bg-surface-900 rounded-2xl border border-surface-200 dark:border-surface-700 overflow-hidden">
+                <div class="p-6 text-surface-900 dark:text-surface-0">
+                    <app-session-management></app-session-management>
+                </div>
+            </div>
+
+            <!-- Webhooks Section -->
+            <div class="mt-8 bg-surface-0 dark:bg-surface-900 rounded-2xl border border-surface-200 dark:border-surface-700 overflow-hidden">
+                <div class="p-6 text-surface-900 dark:text-surface-0">
+                    <app-webhook-management></app-webhook-management>
+                </div>
+            </div>
         </div>
     `
 })
-export class Settings {}
+export class Settings { }
