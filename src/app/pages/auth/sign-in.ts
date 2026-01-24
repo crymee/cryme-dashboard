@@ -92,7 +92,9 @@ export class SignIn {
         private readonly authService: AuthService,
         private readonly loggerService: LoggerService,
         private readonly pusherBeamsService: PusherBeamsService
-    ) {}
+    ) {
+        this.authService.resetTwoFactorState();
+    }
 
     get email() {
         return this.form.controls.email;
@@ -116,7 +118,14 @@ export class SignIn {
             })
             .pipe(
                 switchMap(async (res) => {
-                    const payload = res.data?.signIn;
+                    const payload = res.data?.signIn as any;
+
+                    if (payload?.requiresTwoFactor && payload.twoFactorMethod) {
+                        const method = payload.twoFactorMethod === 'totp' || payload.twoFactorMethod === 'email' ? payload.twoFactorMethod : null;
+                        this.authService.setTwoFactorRequired(method, payload.totpEnabled, payload.emailEnabled);
+                        this.loggerService.info('2FA required');
+                        return from(this.router.navigate(['/auth/verify-two-factor']));
+                    }
 
                     if (payload?.user) {
                         try {
@@ -125,7 +134,7 @@ export class SignIn {
                             this.loggerService.error(e);
                         }
 
-                        this.authService.setUser(payload.user, payload.sessionId);
+                        this.authService.setUser(payload.user, payload.sessionId || '');
                         this.loggerService.info(payload.user);
 
                         return from(this.router.navigate(['/']));

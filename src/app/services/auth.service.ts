@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { Router } from '@angular/router';
 import { Apollo } from 'apollo-angular';
@@ -11,6 +11,8 @@ export interface User {
     email: string;
     firstName: string;
     lastName: string;
+    twoFactorEnabled?: boolean;
+    twoFactorMethod?: 'totp' | 'email' | null;
 }
 
 export interface AuthData {
@@ -26,6 +28,10 @@ export class AuthService {
 
     public user$ = this._user.asObservable();
     public isAuthenticated$ = new BehaviorSubject<boolean>(false);
+    public twoFactorRequired = signal<boolean>(false);
+    public twoFactorMethod = signal<'totp' | 'email' | null>(null);
+    public twoFactorTotpEnabled = signal<boolean>(false);
+    public twoFactorEmailEnabled = signal<boolean>(false);
 
     private authChecked: Promise<void>;
 
@@ -67,10 +73,38 @@ export class AuthService {
     public setUser(user: User, sessionId?: string) {
         this._user.next(user);
         this.isAuthenticated$.next(true);
+        this.twoFactorRequired.set(false);
+        this.twoFactorMethod.set(null);
+        this.twoFactorTotpEnabled.set(false);
+        this.twoFactorEmailEnabled.set(false);
         this.localStorage.setItem('user', user);
         if (sessionId) {
             this.localStorage.setItem('sessionId', sessionId);
         }
+    }
+
+    public setTwoFactorRequired(method: 'totp' | 'email' | null, totpEnabled: boolean = false, emailEnabled: boolean = false) {
+        this.twoFactorRequired.set(!!method);
+        this.twoFactorMethod.set(method);
+        this.twoFactorTotpEnabled.set(totpEnabled);
+        this.twoFactorEmailEnabled.set(emailEnabled);
+    }
+
+    public setTwoFactorVerified(user: User) {
+        this._user.next(user);
+        this.isAuthenticated$.next(true);
+        this.twoFactorRequired.set(false);
+        this.twoFactorMethod.set(null);
+        this.twoFactorTotpEnabled.set(false);
+        this.twoFactorEmailEnabled.set(false);
+        this.localStorage.setItem('user', user);
+    }
+
+    public resetTwoFactorState() {
+        this.twoFactorRequired.set(false);
+        this.twoFactorMethod.set(null);
+        this.twoFactorTotpEnabled.set(false);
+        this.twoFactorEmailEnabled.set(false);
     }
 
     public async logout() {
@@ -81,6 +115,10 @@ export class AuthService {
         } finally {
             this._user.next(null);
             this.isAuthenticated$.next(false);
+            this.twoFactorRequired.set(false);
+            this.twoFactorMethod.set(null);
+            this.twoFactorTotpEnabled.set(false);
+            this.twoFactorEmailEnabled.set(false);
             this.apollo.client.resetStore();
             await this.localStorage.removeItem('user');
             await this.localStorage.removeItem('sessionId');

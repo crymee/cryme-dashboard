@@ -20,10 +20,21 @@ export type Scalars = {
 /** Payload includes user and session id */
 export type AuthPayload = {
   __typename?: 'AuthPayload';
+  /** Whether two-factor authentication is required */
+  requiresTwoFactor?: Maybe<Scalars['Boolean']['output']>;
   /** Session ID */
-  sessionId: Scalars['String']['output'];
+  sessionId?: Maybe<Scalars['String']['output']>;
+  /** The two-factor authentication method */
+  twoFactorMethod?: Maybe<Scalars['String']['output']>;
   /** Authenticated user */
   user?: Maybe<UserItem>;
+};
+
+/** Payload for backup codes */
+export type BackupCodesPayload = {
+  __typename?: 'BackupCodesPayload';
+  /** New backup recovery codes */
+  backupCodes: Array<Maybe<Scalars['String']['output']>>;
 };
 
 export type FileCreatedAtFilters = {
@@ -529,11 +540,18 @@ export type FileUserRelation = {
   /** Date */
   createdAt?: Maybe<Scalars['String']['output']>;
   email: Scalars['String']['output'];
+  emailVerifiedAt?: Maybe<Scalars['String']['output']>;
   files: Array<FileUserRelationFilesRelation>;
   firstName: Scalars['String']['output'];
   id: Scalars['String']['output'];
   lastName: Scalars['String']['output'];
   password: Scalars['String']['output'];
+  phoneNumber?: Maybe<Scalars['String']['output']>;
+  /** JSON */
+  twoFactorBackupCodes?: Maybe<Scalars['String']['output']>;
+  twoFactorEnabled: Scalars['Boolean']['output'];
+  twoFactorMethod?: Maybe<UserTwoFactorMethodEnum>;
+  twoFactorSecret?: Maybe<Scalars['String']['output']>;
   /** Date */
   updatedAt?: Maybe<Scalars['String']['output']>;
 };
@@ -802,10 +820,20 @@ export type InnerOrder = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  /** Disable two-factor authentication */
+  disableTwoFactor: Scalars['String']['output'];
+  /** Enable email 2FA by sending a verification code */
+  enableEmail2FA: Scalars['String']['output'];
+  /** Enable TOTP two-factor authentication */
+  enableTOTP: TotpSetupPayload;
   /** Request a password reset link */
   forgotPassword: Scalars['String']['output'];
+  /** Generate new backup codes */
+  generateBackupCodes: BackupCodesPayload;
   /** Sign out a user */
   logout: Scalars['String']['output'];
+  /** Resend email 2FA verification code */
+  resendEmail2FACode: Scalars['String']['output'];
   /** Reset password with token */
   resetPassword: Scalars['String']['output'];
   /** Sign in a user */
@@ -814,6 +842,12 @@ export type Mutation = {
   signUp?: Maybe<UserItem>;
   /** Sync a batch of file metadata into the database. */
   syncDriveFiles: Array<FileItem>;
+  /** Verify email 2FA code to enable email 2FA */
+  verifyEmail2FACode: BackupCodesPayload;
+  /** Verify TOTP setup and enable two-factor authentication */
+  verifyTOTPSetup: BackupCodesPayload;
+  /** Verify two-factor authentication code */
+  verifyTwoFactorCode: Scalars['String']['output'];
 };
 
 
@@ -841,6 +875,21 @@ export type MutationSyncDriveFilesArgs = {
   files: Array<GoogleDriveFileInput>;
 };
 
+
+export type MutationVerifyEmail2FaCodeArgs = {
+  data: Scalars['String']['input'];
+};
+
+
+export type MutationVerifyTotpSetupArgs = {
+  data: TotpSetupInput;
+};
+
+
+export type MutationVerifyTwoFactorCodeArgs = {
+  data: Scalars['String']['input'];
+};
+
 /** Order by direction */
 export enum OrderDirection {
   /** Ascending order */
@@ -854,6 +903,8 @@ export type Query = {
   files: Array<FileSelectItem>;
   /** Get current authenticated user */
   me?: Maybe<UserItem>;
+  /** Get two-factor authentication status */
+  twoFactorStatus: TwoFactorStatus;
   users: Array<UserSelectItem>;
   videoMetadata: Array<VideoMetadataSelectItem>;
 };
@@ -910,6 +961,36 @@ export type SignUpInput = {
   password: Scalars['String']['input'];
 };
 
+/** Input type for TOTP setup */
+export type TotpSetupInput = {
+  /** The TOTP code from authenticator app */
+  code: Scalars['String']['input'];
+  /** The TOTP secret key */
+  secret: Scalars['String']['input'];
+};
+
+/** Payload for TOTP setup */
+export type TotpSetupPayload = {
+  __typename?: 'TOTPSetupPayload';
+  /** Backup recovery codes */
+  backupCodes: Array<Maybe<Scalars['String']['output']>>;
+  /** QR code image as base64 */
+  qrCodeImage: Scalars['String']['output'];
+  /** The TOTP secret key */
+  secret: Scalars['String']['output'];
+};
+
+/** Two-factor authentication status */
+export type TwoFactorStatus = {
+  __typename?: 'TwoFactorStatus';
+  /** Whether two-factor authentication is enabled */
+  enabled: Scalars['Boolean']['output'];
+  /** Whether backup codes are available */
+  hasBackupCodes: Scalars['Boolean']['output'];
+  /** The two-factor authentication method */
+  method?: Maybe<Scalars['String']['output']>;
+};
+
 export type UserCreatedAtFilters = {
   OR?: InputMaybe<Array<UserCreatedAtfiltersOr>>;
   /** Date */
@@ -963,6 +1044,45 @@ export type UserCreatedAtfiltersOr = {
 
 export type UserEmailFilters = {
   OR?: InputMaybe<Array<UserEmailfiltersOr>>;
+  eq?: InputMaybe<Scalars['String']['input']>;
+  gt?: InputMaybe<Scalars['String']['input']>;
+  gte?: InputMaybe<Scalars['String']['input']>;
+  ilike?: InputMaybe<Scalars['String']['input']>;
+  /** Array<undefined> */
+  inArray?: InputMaybe<Array<Scalars['String']['input']>>;
+  isNotNull?: InputMaybe<Scalars['Boolean']['input']>;
+  isNull?: InputMaybe<Scalars['Boolean']['input']>;
+  like?: InputMaybe<Scalars['String']['input']>;
+  lt?: InputMaybe<Scalars['String']['input']>;
+  lte?: InputMaybe<Scalars['String']['input']>;
+  ne?: InputMaybe<Scalars['String']['input']>;
+  notIlike?: InputMaybe<Scalars['String']['input']>;
+  /** Array<undefined> */
+  notInArray?: InputMaybe<Array<Scalars['String']['input']>>;
+  notLike?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UserEmailVerifiedAtFilters = {
+  OR?: InputMaybe<Array<UserEmailVerifiedAtfiltersOr>>;
+  eq?: InputMaybe<Scalars['String']['input']>;
+  gt?: InputMaybe<Scalars['String']['input']>;
+  gte?: InputMaybe<Scalars['String']['input']>;
+  ilike?: InputMaybe<Scalars['String']['input']>;
+  /** Array<undefined> */
+  inArray?: InputMaybe<Array<Scalars['String']['input']>>;
+  isNotNull?: InputMaybe<Scalars['Boolean']['input']>;
+  isNull?: InputMaybe<Scalars['Boolean']['input']>;
+  like?: InputMaybe<Scalars['String']['input']>;
+  lt?: InputMaybe<Scalars['String']['input']>;
+  lte?: InputMaybe<Scalars['String']['input']>;
+  ne?: InputMaybe<Scalars['String']['input']>;
+  notIlike?: InputMaybe<Scalars['String']['input']>;
+  /** Array<undefined> */
+  notInArray?: InputMaybe<Array<Scalars['String']['input']>>;
+  notLike?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UserEmailVerifiedAtfiltersOr = {
   eq?: InputMaybe<Scalars['String']['input']>;
   gt?: InputMaybe<Scalars['String']['input']>;
   gte?: InputMaybe<Scalars['String']['input']>;
@@ -1067,10 +1187,17 @@ export type UserFilesRelationUserRelation = {
   /** Date */
   createdAt?: Maybe<Scalars['String']['output']>;
   email: Scalars['String']['output'];
+  emailVerifiedAt?: Maybe<Scalars['String']['output']>;
   firstName: Scalars['String']['output'];
   id: Scalars['String']['output'];
   lastName: Scalars['String']['output'];
   password: Scalars['String']['output'];
+  phoneNumber?: Maybe<Scalars['String']['output']>;
+  /** JSON */
+  twoFactorBackupCodes?: Maybe<Scalars['String']['output']>;
+  twoFactorEnabled: Scalars['Boolean']['output'];
+  twoFactorMethod?: Maybe<UserTwoFactorMethodEnum>;
+  twoFactorSecret?: Maybe<Scalars['String']['output']>;
   /** Date */
   updatedAt?: Maybe<Scalars['String']['output']>;
 };
@@ -1111,20 +1238,32 @@ export type UserFilters = {
   OR?: InputMaybe<Array<UserFiltersOr>>;
   createdAt?: InputMaybe<UserCreatedAtFilters>;
   email?: InputMaybe<UserEmailFilters>;
+  emailVerifiedAt?: InputMaybe<UserEmailVerifiedAtFilters>;
   firstName?: InputMaybe<UserFirstNameFilters>;
   id?: InputMaybe<UserIdFilters>;
   lastName?: InputMaybe<UserLastNameFilters>;
   password?: InputMaybe<UserPasswordFilters>;
+  phoneNumber?: InputMaybe<UserPhoneNumberFilters>;
+  twoFactorBackupCodes?: InputMaybe<UserTwoFactorBackupCodesFilters>;
+  twoFactorEnabled?: InputMaybe<UserTwoFactorEnabledFilters>;
+  twoFactorMethod?: InputMaybe<UserTwoFactorMethodFilters>;
+  twoFactorSecret?: InputMaybe<UserTwoFactorSecretFilters>;
   updatedAt?: InputMaybe<UserUpdatedAtFilters>;
 };
 
 export type UserFiltersOr = {
   createdAt?: InputMaybe<UserCreatedAtFilters>;
   email?: InputMaybe<UserEmailFilters>;
+  emailVerifiedAt?: InputMaybe<UserEmailVerifiedAtFilters>;
   firstName?: InputMaybe<UserFirstNameFilters>;
   id?: InputMaybe<UserIdFilters>;
   lastName?: InputMaybe<UserLastNameFilters>;
   password?: InputMaybe<UserPasswordFilters>;
+  phoneNumber?: InputMaybe<UserPhoneNumberFilters>;
+  twoFactorBackupCodes?: InputMaybe<UserTwoFactorBackupCodesFilters>;
+  twoFactorEnabled?: InputMaybe<UserTwoFactorEnabledFilters>;
+  twoFactorMethod?: InputMaybe<UserTwoFactorMethodFilters>;
+  twoFactorSecret?: InputMaybe<UserTwoFactorSecretFilters>;
   updatedAt?: InputMaybe<UserUpdatedAtFilters>;
 };
 
@@ -1211,10 +1350,17 @@ export type UserItem = {
   /** Date */
   createdAt?: Maybe<Scalars['String']['output']>;
   email: Scalars['String']['output'];
+  emailVerifiedAt?: Maybe<Scalars['String']['output']>;
   firstName: Scalars['String']['output'];
   id: Scalars['String']['output'];
   lastName: Scalars['String']['output'];
   password: Scalars['String']['output'];
+  phoneNumber?: Maybe<Scalars['String']['output']>;
+  /** JSON */
+  twoFactorBackupCodes?: Maybe<Scalars['String']['output']>;
+  twoFactorEnabled: Scalars['Boolean']['output'];
+  twoFactorMethod?: Maybe<UserTwoFactorMethodEnum>;
+  twoFactorSecret?: Maybe<Scalars['String']['output']>;
   /** Date */
   updatedAt?: Maybe<Scalars['String']['output']>;
 };
@@ -1261,10 +1407,16 @@ export type UserLastNamefiltersOr = {
 export type UserOrderBy = {
   createdAt?: InputMaybe<InnerOrder>;
   email?: InputMaybe<InnerOrder>;
+  emailVerifiedAt?: InputMaybe<InnerOrder>;
   firstName?: InputMaybe<InnerOrder>;
   id?: InputMaybe<InnerOrder>;
   lastName?: InputMaybe<InnerOrder>;
   password?: InputMaybe<InnerOrder>;
+  phoneNumber?: InputMaybe<InnerOrder>;
+  twoFactorBackupCodes?: InputMaybe<InnerOrder>;
+  twoFactorEnabled?: InputMaybe<InnerOrder>;
+  twoFactorMethod?: InputMaybe<InnerOrder>;
+  twoFactorSecret?: InputMaybe<InnerOrder>;
   updatedAt?: InputMaybe<InnerOrder>;
 };
 
@@ -1307,16 +1459,62 @@ export type UserPasswordfiltersOr = {
   notLike?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type UserPhoneNumberFilters = {
+  OR?: InputMaybe<Array<UserPhoneNumberfiltersOr>>;
+  eq?: InputMaybe<Scalars['String']['input']>;
+  gt?: InputMaybe<Scalars['String']['input']>;
+  gte?: InputMaybe<Scalars['String']['input']>;
+  ilike?: InputMaybe<Scalars['String']['input']>;
+  /** Array<undefined> */
+  inArray?: InputMaybe<Array<Scalars['String']['input']>>;
+  isNotNull?: InputMaybe<Scalars['Boolean']['input']>;
+  isNull?: InputMaybe<Scalars['Boolean']['input']>;
+  like?: InputMaybe<Scalars['String']['input']>;
+  lt?: InputMaybe<Scalars['String']['input']>;
+  lte?: InputMaybe<Scalars['String']['input']>;
+  ne?: InputMaybe<Scalars['String']['input']>;
+  notIlike?: InputMaybe<Scalars['String']['input']>;
+  /** Array<undefined> */
+  notInArray?: InputMaybe<Array<Scalars['String']['input']>>;
+  notLike?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UserPhoneNumberfiltersOr = {
+  eq?: InputMaybe<Scalars['String']['input']>;
+  gt?: InputMaybe<Scalars['String']['input']>;
+  gte?: InputMaybe<Scalars['String']['input']>;
+  ilike?: InputMaybe<Scalars['String']['input']>;
+  /** Array<undefined> */
+  inArray?: InputMaybe<Array<Scalars['String']['input']>>;
+  isNotNull?: InputMaybe<Scalars['Boolean']['input']>;
+  isNull?: InputMaybe<Scalars['Boolean']['input']>;
+  like?: InputMaybe<Scalars['String']['input']>;
+  lt?: InputMaybe<Scalars['String']['input']>;
+  lte?: InputMaybe<Scalars['String']['input']>;
+  ne?: InputMaybe<Scalars['String']['input']>;
+  notIlike?: InputMaybe<Scalars['String']['input']>;
+  /** Array<undefined> */
+  notInArray?: InputMaybe<Array<Scalars['String']['input']>>;
+  notLike?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type UserSelectItem = {
   __typename?: 'UserSelectItem';
   /** Date */
   createdAt?: Maybe<Scalars['String']['output']>;
   email: Scalars['String']['output'];
+  emailVerifiedAt?: Maybe<Scalars['String']['output']>;
   files: Array<UserFilesRelation>;
   firstName: Scalars['String']['output'];
   id: Scalars['String']['output'];
   lastName: Scalars['String']['output'];
   password: Scalars['String']['output'];
+  phoneNumber?: Maybe<Scalars['String']['output']>;
+  /** JSON */
+  twoFactorBackupCodes?: Maybe<Scalars['String']['output']>;
+  twoFactorEnabled: Scalars['Boolean']['output'];
+  twoFactorMethod?: Maybe<UserTwoFactorMethodEnum>;
+  twoFactorSecret?: Maybe<Scalars['String']['output']>;
   /** Date */
   updatedAt?: Maybe<Scalars['String']['output']>;
 };
@@ -1327,6 +1525,181 @@ export type UserSelectItemFilesArgs = {
   offset?: InputMaybe<Scalars['Int']['input']>;
   orderBy?: InputMaybe<FileOrderBy>;
   where?: InputMaybe<FileFilters>;
+};
+
+export type UserTwoFactorBackupCodesFilters = {
+  OR?: InputMaybe<Array<UserTwoFactorBackupCodesfiltersOr>>;
+  /** JSON */
+  eq?: InputMaybe<Scalars['String']['input']>;
+  /** JSON */
+  gt?: InputMaybe<Scalars['String']['input']>;
+  /** JSON */
+  gte?: InputMaybe<Scalars['String']['input']>;
+  ilike?: InputMaybe<Scalars['String']['input']>;
+  /** Array<JSON> */
+  inArray?: InputMaybe<Array<Scalars['String']['input']>>;
+  isNotNull?: InputMaybe<Scalars['Boolean']['input']>;
+  isNull?: InputMaybe<Scalars['Boolean']['input']>;
+  like?: InputMaybe<Scalars['String']['input']>;
+  /** JSON */
+  lt?: InputMaybe<Scalars['String']['input']>;
+  /** JSON */
+  lte?: InputMaybe<Scalars['String']['input']>;
+  /** JSON */
+  ne?: InputMaybe<Scalars['String']['input']>;
+  notIlike?: InputMaybe<Scalars['String']['input']>;
+  /** Array<JSON> */
+  notInArray?: InputMaybe<Array<Scalars['String']['input']>>;
+  notLike?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UserTwoFactorBackupCodesfiltersOr = {
+  /** JSON */
+  eq?: InputMaybe<Scalars['String']['input']>;
+  /** JSON */
+  gt?: InputMaybe<Scalars['String']['input']>;
+  /** JSON */
+  gte?: InputMaybe<Scalars['String']['input']>;
+  ilike?: InputMaybe<Scalars['String']['input']>;
+  /** Array<JSON> */
+  inArray?: InputMaybe<Array<Scalars['String']['input']>>;
+  isNotNull?: InputMaybe<Scalars['Boolean']['input']>;
+  isNull?: InputMaybe<Scalars['Boolean']['input']>;
+  like?: InputMaybe<Scalars['String']['input']>;
+  /** JSON */
+  lt?: InputMaybe<Scalars['String']['input']>;
+  /** JSON */
+  lte?: InputMaybe<Scalars['String']['input']>;
+  /** JSON */
+  ne?: InputMaybe<Scalars['String']['input']>;
+  notIlike?: InputMaybe<Scalars['String']['input']>;
+  /** Array<JSON> */
+  notInArray?: InputMaybe<Array<Scalars['String']['input']>>;
+  notLike?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UserTwoFactorEnabledFilters = {
+  OR?: InputMaybe<Array<UserTwoFactorEnabledfiltersOr>>;
+  eq?: InputMaybe<Scalars['Boolean']['input']>;
+  gt?: InputMaybe<Scalars['Boolean']['input']>;
+  gte?: InputMaybe<Scalars['Boolean']['input']>;
+  ilike?: InputMaybe<Scalars['String']['input']>;
+  /** Array<undefined> */
+  inArray?: InputMaybe<Array<Scalars['Boolean']['input']>>;
+  isNotNull?: InputMaybe<Scalars['Boolean']['input']>;
+  isNull?: InputMaybe<Scalars['Boolean']['input']>;
+  like?: InputMaybe<Scalars['String']['input']>;
+  lt?: InputMaybe<Scalars['Boolean']['input']>;
+  lte?: InputMaybe<Scalars['Boolean']['input']>;
+  ne?: InputMaybe<Scalars['Boolean']['input']>;
+  notIlike?: InputMaybe<Scalars['String']['input']>;
+  /** Array<undefined> */
+  notInArray?: InputMaybe<Array<Scalars['Boolean']['input']>>;
+  notLike?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UserTwoFactorEnabledfiltersOr = {
+  eq?: InputMaybe<Scalars['Boolean']['input']>;
+  gt?: InputMaybe<Scalars['Boolean']['input']>;
+  gte?: InputMaybe<Scalars['Boolean']['input']>;
+  ilike?: InputMaybe<Scalars['String']['input']>;
+  /** Array<undefined> */
+  inArray?: InputMaybe<Array<Scalars['Boolean']['input']>>;
+  isNotNull?: InputMaybe<Scalars['Boolean']['input']>;
+  isNull?: InputMaybe<Scalars['Boolean']['input']>;
+  like?: InputMaybe<Scalars['String']['input']>;
+  lt?: InputMaybe<Scalars['Boolean']['input']>;
+  lte?: InputMaybe<Scalars['Boolean']['input']>;
+  ne?: InputMaybe<Scalars['Boolean']['input']>;
+  notIlike?: InputMaybe<Scalars['String']['input']>;
+  /** Array<undefined> */
+  notInArray?: InputMaybe<Array<Scalars['Boolean']['input']>>;
+  notLike?: InputMaybe<Scalars['String']['input']>;
+};
+
+export enum UserTwoFactorMethodEnum {
+  /** Value: email */
+  Email = 'email',
+  /** Value: totp */
+  Totp = 'totp'
+}
+
+export type UserTwoFactorMethodFilters = {
+  OR?: InputMaybe<Array<UserTwoFactorMethodfiltersOr>>;
+  eq?: InputMaybe<UserTwoFactorMethodEnum>;
+  gt?: InputMaybe<UserTwoFactorMethodEnum>;
+  gte?: InputMaybe<UserTwoFactorMethodEnum>;
+  ilike?: InputMaybe<Scalars['String']['input']>;
+  /** Array<undefined> */
+  inArray?: InputMaybe<Array<UserTwoFactorMethodEnum>>;
+  isNotNull?: InputMaybe<Scalars['Boolean']['input']>;
+  isNull?: InputMaybe<Scalars['Boolean']['input']>;
+  like?: InputMaybe<Scalars['String']['input']>;
+  lt?: InputMaybe<UserTwoFactorMethodEnum>;
+  lte?: InputMaybe<UserTwoFactorMethodEnum>;
+  ne?: InputMaybe<UserTwoFactorMethodEnum>;
+  notIlike?: InputMaybe<Scalars['String']['input']>;
+  /** Array<undefined> */
+  notInArray?: InputMaybe<Array<UserTwoFactorMethodEnum>>;
+  notLike?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UserTwoFactorMethodfiltersOr = {
+  eq?: InputMaybe<UserTwoFactorMethodEnum>;
+  gt?: InputMaybe<UserTwoFactorMethodEnum>;
+  gte?: InputMaybe<UserTwoFactorMethodEnum>;
+  ilike?: InputMaybe<Scalars['String']['input']>;
+  /** Array<undefined> */
+  inArray?: InputMaybe<Array<UserTwoFactorMethodEnum>>;
+  isNotNull?: InputMaybe<Scalars['Boolean']['input']>;
+  isNull?: InputMaybe<Scalars['Boolean']['input']>;
+  like?: InputMaybe<Scalars['String']['input']>;
+  lt?: InputMaybe<UserTwoFactorMethodEnum>;
+  lte?: InputMaybe<UserTwoFactorMethodEnum>;
+  ne?: InputMaybe<UserTwoFactorMethodEnum>;
+  notIlike?: InputMaybe<Scalars['String']['input']>;
+  /** Array<undefined> */
+  notInArray?: InputMaybe<Array<UserTwoFactorMethodEnum>>;
+  notLike?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UserTwoFactorSecretFilters = {
+  OR?: InputMaybe<Array<UserTwoFactorSecretfiltersOr>>;
+  eq?: InputMaybe<Scalars['String']['input']>;
+  gt?: InputMaybe<Scalars['String']['input']>;
+  gte?: InputMaybe<Scalars['String']['input']>;
+  ilike?: InputMaybe<Scalars['String']['input']>;
+  /** Array<undefined> */
+  inArray?: InputMaybe<Array<Scalars['String']['input']>>;
+  isNotNull?: InputMaybe<Scalars['Boolean']['input']>;
+  isNull?: InputMaybe<Scalars['Boolean']['input']>;
+  like?: InputMaybe<Scalars['String']['input']>;
+  lt?: InputMaybe<Scalars['String']['input']>;
+  lte?: InputMaybe<Scalars['String']['input']>;
+  ne?: InputMaybe<Scalars['String']['input']>;
+  notIlike?: InputMaybe<Scalars['String']['input']>;
+  /** Array<undefined> */
+  notInArray?: InputMaybe<Array<Scalars['String']['input']>>;
+  notLike?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UserTwoFactorSecretfiltersOr = {
+  eq?: InputMaybe<Scalars['String']['input']>;
+  gt?: InputMaybe<Scalars['String']['input']>;
+  gte?: InputMaybe<Scalars['String']['input']>;
+  ilike?: InputMaybe<Scalars['String']['input']>;
+  /** Array<undefined> */
+  inArray?: InputMaybe<Array<Scalars['String']['input']>>;
+  isNotNull?: InputMaybe<Scalars['Boolean']['input']>;
+  isNull?: InputMaybe<Scalars['Boolean']['input']>;
+  like?: InputMaybe<Scalars['String']['input']>;
+  lt?: InputMaybe<Scalars['String']['input']>;
+  lte?: InputMaybe<Scalars['String']['input']>;
+  ne?: InputMaybe<Scalars['String']['input']>;
+  notIlike?: InputMaybe<Scalars['String']['input']>;
+  /** Array<undefined> */
+  notInArray?: InputMaybe<Array<Scalars['String']['input']>>;
+  notLike?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type UserUpdatedAtFilters = {
@@ -1564,11 +1937,18 @@ export type VideoMetadataFileRelationUserRelation = {
   /** Date */
   createdAt?: Maybe<Scalars['String']['output']>;
   email: Scalars['String']['output'];
+  emailVerifiedAt?: Maybe<Scalars['String']['output']>;
   files: Array<VideoMetadataFileRelationUserRelationFilesRelation>;
   firstName: Scalars['String']['output'];
   id: Scalars['String']['output'];
   lastName: Scalars['String']['output'];
   password: Scalars['String']['output'];
+  phoneNumber?: Maybe<Scalars['String']['output']>;
+  /** JSON */
+  twoFactorBackupCodes?: Maybe<Scalars['String']['output']>;
+  twoFactorEnabled: Scalars['Boolean']['output'];
+  twoFactorMethod?: Maybe<UserTwoFactorMethodEnum>;
+  twoFactorSecret?: Maybe<Scalars['String']['output']>;
   /** Date */
   updatedAt?: Maybe<Scalars['String']['output']>;
 };
@@ -1815,7 +2195,7 @@ export type UserSelectItemFragment = { __typename?: 'UserSelectItem', id: string
 
 export type UserItemFragment = { __typename?: 'UserItem', id: string, email: string, lastName: string, firstName: string };
 
-export type AuthPayloadFragment = { __typename?: 'AuthPayload', sessionId: string, user?: { __typename?: 'UserItem', id: string, email: string, lastName: string, firstName: string } | null };
+export type AuthPayloadFragment = { __typename?: 'AuthPayload', sessionId?: string | null, requiresTwoFactor?: boolean | null, twoFactorMethod?: string | null, user?: { __typename?: 'UserItem', id: string, email: string, lastName: string, firstName: string } | null };
 
 export type UsersQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -1825,7 +2205,7 @@ export type UsersQuery = { __typename?: 'Query', users: Array<{ __typename?: 'Us
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'UserItem', id: string, email: string, lastName: string, firstName: string } | null };
+export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'UserItem', id: string, email: string, lastName: string, firstName: string, twoFactorEnabled: boolean, twoFactorMethod?: UserTwoFactorMethodEnum | null } | null };
 
 export type SignUpMutationVariables = Exact<{
   data: SignUpInput;
@@ -1839,7 +2219,7 @@ export type SignInMutationVariables = Exact<{
 }>;
 
 
-export type SignInMutation = { __typename?: 'Mutation', signIn: { __typename?: 'AuthPayload', sessionId: string, user?: { __typename?: 'UserItem', id: string, email: string, lastName: string, firstName: string } | null } };
+export type SignInMutation = { __typename?: 'Mutation', signIn: { __typename?: 'AuthPayload', sessionId?: string | null, requiresTwoFactor?: boolean | null, twoFactorMethod?: string | null, user?: { __typename?: 'UserItem', id: string, email: string, lastName: string, firstName: string } | null } };
 
 export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -1859,6 +2239,57 @@ export type ResetPasswordMutationVariables = Exact<{
 
 
 export type ResetPasswordMutation = { __typename?: 'Mutation', resetPassword: string };
+
+export type EnableTotpMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type EnableTotpMutation = { __typename?: 'Mutation', enableTOTP: { __typename?: 'TOTPSetupPayload', secret: string, qrCodeImage: string, backupCodes: Array<string | null> } };
+
+export type VerifyTotpSetupMutationVariables = Exact<{
+  data: TotpSetupInput;
+}>;
+
+
+export type VerifyTotpSetupMutation = { __typename?: 'Mutation', verifyTOTPSetup: { __typename?: 'BackupCodesPayload', backupCodes: Array<string | null> } };
+
+export type DisableTwoFactorMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type DisableTwoFactorMutation = { __typename?: 'Mutation', disableTwoFactor: string };
+
+export type VerifyTwoFactorCodeMutationVariables = Exact<{
+  data: Scalars['String']['input'];
+}>;
+
+
+export type VerifyTwoFactorCodeMutation = { __typename?: 'Mutation', verifyTwoFactorCode: string };
+
+export type GenerateBackupCodesMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GenerateBackupCodesMutation = { __typename?: 'Mutation', generateBackupCodes: { __typename?: 'BackupCodesPayload', backupCodes: Array<string | null> } };
+
+export type EnableEmail2FaMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type EnableEmail2FaMutation = { __typename?: 'Mutation', enableEmail2FA: string };
+
+export type VerifyEmail2FaCodeMutationVariables = Exact<{
+  data: Scalars['String']['input'];
+}>;
+
+
+export type VerifyEmail2FaCodeMutation = { __typename?: 'Mutation', verifyEmail2FACode: { __typename?: 'BackupCodesPayload', backupCodes: Array<string | null> } };
+
+export type ResendEmail2FaCodeMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type ResendEmail2FaCodeMutation = { __typename?: 'Mutation', resendEmail2FACode: string };
+
+export type TwoFactorStatusQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type TwoFactorStatusQuery = { __typename?: 'Query', twoFactorStatus: { __typename?: 'TwoFactorStatus', enabled: boolean, method?: string | null, hasBackupCodes: boolean } };
 
 export const UserSelectItemFragmentDoc = gql`
     fragment UserSelectItem on UserSelectItem {
@@ -1882,6 +2313,8 @@ export const AuthPayloadFragmentDoc = gql`
     ...UserItem
   }
   sessionId
+  requiresTwoFactor
+  twoFactorMethod
 }
     ${UserItemFragmentDoc}`;
 export const UsersDocument = gql`
@@ -1909,6 +2342,8 @@ export const MeDocument = gql`
     email
     lastName
     firstName
+    twoFactorEnabled
+    twoFactorMethod
   }
 }
     `;
@@ -1954,6 +2389,8 @@ export const SignInDocument = gql`
       firstName
     }
     sessionId
+    requiresTwoFactor
+    twoFactorMethod
   }
 }
     `;
@@ -2011,6 +2448,164 @@ export const ResetPasswordDocument = gql`
   })
   export class ResetPasswordGQL extends Apollo.Mutation<ResetPasswordMutation, ResetPasswordMutationVariables> {
     document = ResetPasswordDocument;
+    
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
+export const EnableTotpDocument = gql`
+    mutation EnableTOTP {
+  enableTOTP {
+    secret
+    qrCodeImage
+    backupCodes
+  }
+}
+    `;
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class EnableTotpGQL extends Apollo.Mutation<EnableTotpMutation, EnableTotpMutationVariables> {
+    document = EnableTotpDocument;
+    
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
+export const VerifyTotpSetupDocument = gql`
+    mutation VerifyTOTPSetup($data: TOTPSetupInput!) {
+  verifyTOTPSetup(data: $data) {
+    backupCodes
+  }
+}
+    `;
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class VerifyTotpSetupGQL extends Apollo.Mutation<VerifyTotpSetupMutation, VerifyTotpSetupMutationVariables> {
+    document = VerifyTotpSetupDocument;
+    
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
+export const DisableTwoFactorDocument = gql`
+    mutation DisableTwoFactor {
+  disableTwoFactor
+}
+    `;
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class DisableTwoFactorGQL extends Apollo.Mutation<DisableTwoFactorMutation, DisableTwoFactorMutationVariables> {
+    document = DisableTwoFactorDocument;
+    
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
+export const VerifyTwoFactorCodeDocument = gql`
+    mutation VerifyTwoFactorCode($data: String!) {
+  verifyTwoFactorCode(data: $data)
+}
+    `;
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class VerifyTwoFactorCodeGQL extends Apollo.Mutation<VerifyTwoFactorCodeMutation, VerifyTwoFactorCodeMutationVariables> {
+    document = VerifyTwoFactorCodeDocument;
+    
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
+export const GenerateBackupCodesDocument = gql`
+    mutation GenerateBackupCodes {
+  generateBackupCodes {
+    backupCodes
+  }
+}
+    `;
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class GenerateBackupCodesGQL extends Apollo.Mutation<GenerateBackupCodesMutation, GenerateBackupCodesMutationVariables> {
+    document = GenerateBackupCodesDocument;
+    
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
+export const EnableEmail2FaDocument = gql`
+    mutation EnableEmail2FA {
+  enableEmail2FA
+}
+    `;
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class EnableEmail2FaGQL extends Apollo.Mutation<EnableEmail2FaMutation, EnableEmail2FaMutationVariables> {
+    document = EnableEmail2FaDocument;
+    
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
+export const VerifyEmail2FaCodeDocument = gql`
+    mutation VerifyEmail2FACode($data: String!) {
+  verifyEmail2FACode(data: $data) {
+    backupCodes
+  }
+}
+    `;
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class VerifyEmail2FaCodeGQL extends Apollo.Mutation<VerifyEmail2FaCodeMutation, VerifyEmail2FaCodeMutationVariables> {
+    document = VerifyEmail2FaCodeDocument;
+    
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
+export const ResendEmail2FaCodeDocument = gql`
+    mutation ResendEmail2FACode {
+  resendEmail2FACode
+}
+    `;
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class ResendEmail2FaCodeGQL extends Apollo.Mutation<ResendEmail2FaCodeMutation, ResendEmail2FaCodeMutationVariables> {
+    document = ResendEmail2FaCodeDocument;
+    
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
+export const TwoFactorStatusDocument = gql`
+    query TwoFactorStatus {
+  twoFactorStatus {
+    enabled
+    method
+    hasBackupCodes
+  }
+}
+    `;
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class TwoFactorStatusGQL extends Apollo.Query<TwoFactorStatusQuery, TwoFactorStatusQueryVariables> {
+    document = TwoFactorStatusDocument;
     
     constructor(apollo: Apollo.Apollo) {
       super(apollo);

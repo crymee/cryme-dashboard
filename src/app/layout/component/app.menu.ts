@@ -29,6 +29,10 @@ export class AppMenu {
                 items: [{ label: 'Files', icon: 'pi pi-fw pi-id-card', routerLink: ['/files'] }]
             },
             {
+                label: 'Settings',
+                items: [{ label: 'Security', icon: 'pi pi-fw pi-shield', routerLink: ['/settings'] }]
+            },
+            {
                 label: 'UI Components',
                 items: [
                     { label: 'Form Layout', icon: 'pi pi-fw pi-id-card', routerLink: ['/uikit/formlayout'] },
