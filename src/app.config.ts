@@ -1,4 +1,4 @@
-import { provideHttpClient, withFetch, withInterceptorsFromDi } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { ApplicationConfig, inject } from '@angular/core';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideRouter, withEnabledBlockingInitialNavigation, withInMemoryScrolling } from '@angular/router';
@@ -13,11 +13,12 @@ import { ApolloLink, CombinedGraphQLErrors, CombinedProtocolErrors, InMemoryCach
 import { environment } from './environments/environment';
 import { ErrorLink } from '@apollo/client/link/error';
 import { LoggerService } from '@/services/logger.service';
+import { MessageService } from 'primeng/api';
 
 export const appConfig: ApplicationConfig = {
     providers: [
         provideAnimationsAsync(),
-        provideHttpClient(withFetch(), withInterceptorsFromDi()),
+        provideHttpClient(withInterceptorsFromDi()),
         provideRouter(appRoutes, withInMemoryScrolling({ anchorScrolling: 'enabled', scrollPositionRestoration: 'enabled' }), withEnabledBlockingInitialNavigation()),
         provideApollo(() => {
             const loggerService = inject(LoggerService);
@@ -37,6 +38,7 @@ export const appConfig: ApplicationConfig = {
                 }
             });
 
+            // Note: Accept-Encoding is automatically sent by browsers
             const link = ApolloLink.from([errorLink, basicHttpLink]);
 
             return {
@@ -45,6 +47,7 @@ export const appConfig: ApplicationConfig = {
             };
         }),
         providePrimeNG({ theme: { preset: Aura, options: { darkModeSelector: '.app-dark' } } }),
-        provideStore({ app: appReducers }, { metaReducers: metaReducers })
+        provideStore({ app: appReducers }, { metaReducers: metaReducers }),
+        MessageService
     ]
 };

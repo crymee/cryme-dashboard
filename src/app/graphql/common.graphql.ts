@@ -233,21 +233,44 @@ export const DELETE_WEBHOOK_MUTATION = gql`
         deleteWebhook(id: $id)
     }
 `;
+export const FILES_COUNT_QUERY = gql`
+    query FilesCount($search: String) {
+        filesCount(search: $search)
+    }
+`;
 export const FILES_QUERY = gql`
-    query Files {
-        files {
+    query Files($limit: Int, $offset: Int, $search: String, $sortBy: String, $sortOrder: String) {
+        files(limit: $limit, offset: $offset, search: $search, sortBy: $sortBy, sortOrder: $sortOrder) {
             id
             filename
             mimetype
             sizeBytes
             storageType
+            storageKey
             createdAt
+            videoMetadata {
+                thumbnailKey
+                vttKey
+            }
         }
     }
 `;
+
+export const FILE_PRESIGNED_URL_QUERY = gql`
+    query FilePresignedUrl($id: String!) {
+        filePresignedUrl(id: $id)
+    }
+`;
+
+export const DELETE_FILE_MUTATION = gql`
+    mutation DeleteFile($id: String!) {
+        deleteFile(id: $id)
+    }
+`;
+
 export const NOTIFICATIONS_QUERY = gql`
-    query Notifications {
-        notifications {
+    query Notifications($limit: Int, $offset: Int) {
+        notifications(limit: $limit, offset: $offset) {
             id
             title
             message
@@ -268,5 +291,17 @@ export const MARK_NOTIFICATION_AS_READ_MUTATION = gql`
 export const MARK_ALL_NOTIFICATIONS_AS_READ_MUTATION = gql`
     mutation MarkAllNotificationsAsRead {
         markAllNotificationsAsRead
+    }
+`;
+
+export const RESEND_VERIFICATION_EMAIL_MUTATION = gql`
+    mutation ResendVerificationEmail($email: String!) {
+        resendVerificationEmail(email: $email)
+    }
+`;
+
+export const VERIFY_EMAIL_MUTATION = gql`
+    mutation VerifyEmail($token: String!) {
+        verifyEmail(token: $token)
     }
 `;

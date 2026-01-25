@@ -26,7 +26,7 @@ import { finalize } from 'rxjs/operators';
                 <div class="flex flex-col md:flex-row gap-4">
                     <div class="flex-1">
                         <label class="block text-xs font-semibold uppercase text-surface-500 mb-2">Endpoint URL</label>
-                        <input pInputText [(ngModel)]="newWebhookUrl" placeholder="https://api.yourdomain.com/webhook" class="w-full p-inputtext-sm" />
+                        <input pInputText [(ngModel)]="newWebhookUrl" placeholder="https://api.yourdomain.com/webhook" class="w-full" />
                     </div>
                     <div class="flex-1">
                         <label class="block text-xs font-semibold uppercase text-surface-500 mb-2">Events</label>
@@ -106,7 +106,7 @@ export class WebhookManagementComponent implements OnInit {
             fetchPolicy: 'network-only'
         }).subscribe({
             next: (result) => {
-                this.webhooks = result.data.webhooks;
+                this.webhooks = [...result.data.webhooks];
                 this.loading = false;
             },
             error: (err) => {

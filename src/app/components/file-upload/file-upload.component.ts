@@ -1,6 +1,6 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClientModule, HttpClient } from '@angular/common/http';
+import { HttpClientModule, HttpClient, HttpEventType } from '@angular/common/http';
 import { ButtonModule } from 'primeng/button';
 import { RippleModule } from 'primeng/ripple';
 import { ProgressBarModule } from 'primeng/progressbar';
@@ -33,9 +33,13 @@ import { environment } from '@/environments/environment';
                 <div *ngFor="let file of uploadingFiles" class="p-4 rounded-xl bg-surface-50 dark:bg-surface-800/50 border border-surface-200 dark:border-surface-700">
                     <div class="flex items-center justify-between mb-2">
                         <span class="text-sm font-medium text-surface-900 dark:text-surface-0 truncate max-w-xs">{{ file.name }}</span>
-                        <span class="text-xs text-surface-500">{{ file.progress }}%</span>
+                        <div class="flex items-center gap-2">
+                            <span *ngIf="file.progress < 95" class="text-xs text-surface-500">{{ file.progress }}%</span>
+                            <span *ngIf="file.progress >= 95" class="text-xs text-primary-500 font-medium animate-pulse">Processing...</span>
+                        </div>
                     </div>
-                    <p-progressBar [value]="file.progress" [showValue]="false" styleClass="h-1.5"></p-progressBar>
+                    <p-progressBar [value]="file.progress" [showValue]="false" styleClass="h-1.5"
+                        [class.processing-bar]="file.progress >= 95"></p-progressBar>
                 </div>
             </div>
         </div>
@@ -46,7 +50,10 @@ export class FileUploadComponent {
     isDragging = false;
     uploadingFiles: { name: string, progress: number }[] = [];
 
-    constructor(private http: HttpClient) { }
+    constructor(
+        private http: HttpClient,
+        private cdr: ChangeDetectorRef
+    ) { }
 
     onDragOver(event: DragEvent) {
         event.preventDefault();
@@ -82,6 +89,7 @@ export class FileUploadComponent {
     private uploadFile(file: File) {
         const fileInfo = { name: file.name, progress: 0 };
         this.uploadingFiles.push(fileInfo);
+        this.cdr.detectChanges(); // Trigger detect changes after push
 
         const formData = new FormData();
         formData.append('file', file);
@@ -90,16 +98,32 @@ export class FileUploadComponent {
             reportProgress: true,
             observe: 'events',
             withCredentials: true
-        }).subscribe((event: any) => {
-            if (event.type === 1) { // UploadProgress
-                fileInfo.progress = Math.round(100 * event.loaded / event.total);
-            } else if (event.type === 4) { // Response
+        }).subscribe({
+            next: (event: any) => {
+                if (event.type === HttpEventType.UploadProgress) {
+                    if (event.total) {
+                        const percent = Math.round(100 * event.loaded / event.total);
+                        // Cap at 95% until server responds to better reflect "processing" time
+                        fileInfo.progress = Math.min(percent, 95);
+                        this.cdr.detectChanges(); // Trigger detect changes on progress update
+                    }
+                } else if (event.type === HttpEventType.Response) {
+                    fileInfo.progress = 100;
+                    this.cdr.detectChanges();
+
+                    // Small delay to let user see 100% before removing
+                    setTimeout(() => {
+                        this.uploadingFiles = this.uploadingFiles.filter(f => f !== fileInfo);
+                        this.onUploadComplete.emit(event.body);
+                        this.cdr.detectChanges();
+                    }, 500);
+                }
+            },
+            error: (error) => {
+                console.error('Upload failed', error);
                 this.uploadingFiles = this.uploadingFiles.filter(f => f !== fileInfo);
-                this.onUploadComplete.emit(event.body);
+                this.cdr.detectChanges(); // Trigger detect changes on error
             }
-        }, (error) => {
-            console.error('Upload failed', error);
-            this.uploadingFiles = this.uploadingFiles.filter(f => f !== fileInfo);
         });
     }
 }

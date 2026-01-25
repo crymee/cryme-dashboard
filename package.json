@@ -30,6 +30,7 @@
     "localforage": "^1.10.0",
     "ngrx-store-localstorage": "^20.0.0",
     "pino": "^10.1.0",
+    "plyr": "^3.8.4",
     "primeclt": "^0.1.5",
     "primeicons": "^7.0.0",
     "primeng": "^20",

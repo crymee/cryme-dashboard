@@ -9,12 +9,13 @@ import { AppFloatingConfigurator } from '@/app/layout/component/app.floatingconf
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MessageModule } from 'primeng/message';
-import { SignInGQL } from '@generated/generated';
+import { ResendVerificationEmailGQL, SignInGQL } from '@generated/generated';
 import { catchError, EMPTY, finalize, from, switchMap } from 'rxjs';
 import { LoggerService } from '@/services/logger.service';
 import { SIGN_IN_FORM_PROVIDER, SignInForm } from '@/app/pages/auth/form';
 import { AuthService } from '@/app/services/auth.service';
 import { PusherBeamsService } from '@/app/services/push-beams.service';
+import { MessageService } from 'primeng/api';
 
 @Component({
     selector: 'app-sign-in',
@@ -71,6 +72,11 @@ import { PusherBeamsService } from '@/app/services/push-beams.service';
                                     <small class="block p-error mb-4">
                                         <p-message severity="error" variant="simple" size="small">{{ item[1] }}</p-message>
                                     </small>
+                                    @if (item[1] && String(item[1]).includes('Please verify your email address')) {
+                                        <div class="text-center mb-4">
+                                           <a class="text-primary cursor-pointer hover:underline" (click)="resendEmail()">Resend Verification Email</a>
+                                        </div>
+                                    }
                                 }
                             }
 
@@ -88,10 +94,12 @@ export class SignIn {
     constructor(
         public form: SignInForm,
         private readonly signInGQL: SignInGQL,
+        private readonly resendVerificationEmailGQL: ResendVerificationEmailGQL,
         private readonly router: Router,
         private readonly authService: AuthService,
         private readonly loggerService: LoggerService,
-        private readonly pusherBeamsService: PusherBeamsService
+        private readonly pusherBeamsService: PusherBeamsService,
+        private readonly messageService: MessageService
     ) {
         this.authService.resetTwoFactorState();
     }
@@ -102,6 +110,23 @@ export class SignIn {
 
     get password() {
         return this.form.controls.password;
+    }
+
+    resendEmail() {
+        const email = this.form.controls.email.value;
+        if (!email) return;
+
+        this.loading.set(true);
+        this.resendVerificationEmailGQL.mutate({ variables: { email } }).subscribe({
+            next: (res) => {
+                this.messageService.add({ severity: 'success', summary: 'Success', detail: res.data?.resendVerificationEmail || 'Verification email sent.' });
+                this.loading.set(false);
+            },
+            error: (err) => {
+                this.messageService.add({ severity: 'error', summary: 'Error', detail: err.message });
+                this.loading.set(false);
+            }
+        });
     }
 
     onSubmit() {
@@ -154,5 +179,6 @@ export class SignIn {
             .subscribe();
     }
 
+    protected readonly String = String;
     protected readonly Object = Object;
 }

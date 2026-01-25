@@ -20,10 +20,14 @@ export type Scalars = {
 /** Payload includes user and session id */
 export type AuthPayload = {
   __typename?: 'AuthPayload';
+  /** Whether Email 2FA is enabled */
+  emailEnabled?: Maybe<Scalars['Boolean']['output']>;
   /** Whether two-factor authentication is required */
   requiresTwoFactor?: Maybe<Scalars['Boolean']['output']>;
   /** Session ID */
   sessionId?: Maybe<Scalars['String']['output']>;
+  /** Whether TOTP is enabled */
+  totpEnabled?: Maybe<Scalars['Boolean']['output']>;
   /** The two-factor authentication method */
   twoFactorMethod?: Maybe<Scalars['String']['output']>;
   /** Authenticated user */
@@ -35,6 +39,24 @@ export type BackupCodesPayload = {
   __typename?: 'BackupCodesPayload';
   /** New backup recovery codes */
   backupCodes: Array<Maybe<Scalars['String']['output']>>;
+};
+
+/** File object */
+export type File = {
+  __typename?: 'File';
+  /** Date */
+  createdAt?: Maybe<Scalars['String']['output']>;
+  filename: Scalars['String']['output'];
+  id: Scalars['String']['output'];
+  mimetype?: Maybe<Scalars['String']['output']>;
+  sizeBytes?: Maybe<Scalars['Int']['output']>;
+  storageKey: Scalars['String']['output'];
+  storageType: FileStorageTypeEnum;
+  /** Date */
+  updatedAt?: Maybe<Scalars['String']['output']>;
+  /** Owner of the file */
+  user?: Maybe<UserItem>;
+  userId: Scalars['String']['output'];
 };
 
 export type FileCreatedAtFilters = {
@@ -549,9 +571,11 @@ export type FileUserRelation = {
   phoneNumber?: Maybe<Scalars['String']['output']>;
   /** JSON */
   twoFactorBackupCodes?: Maybe<Scalars['String']['output']>;
+  twoFactorEmailEnabled: Scalars['Boolean']['output'];
   twoFactorEnabled: Scalars['Boolean']['output'];
   twoFactorMethod?: Maybe<UserTwoFactorMethodEnum>;
   twoFactorSecret?: Maybe<Scalars['String']['output']>;
+  twoFactorTotpEnabled: Scalars['Boolean']['output'];
   /** Date */
   updatedAt?: Maybe<Scalars['String']['output']>;
 };
@@ -820,7 +844,13 @@ export type InnerOrder = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  /** Disable two-factor authentication */
+  /** Delete a webhook */
+  deleteWebhook: Scalars['String']['output'];
+  /** Disable email two-factor authentication */
+  disableEmail2FA: Scalars['String']['output'];
+  /** Disable TOTP (authenticator app) two-factor authentication */
+  disableTOTP: Scalars['String']['output'];
+  /** Disable all two-factor authentication methods */
   disableTwoFactor: Scalars['String']['output'];
   /** Enable email 2FA by sending a verification code */
   enableEmail2FA: Scalars['String']['output'];
@@ -832,16 +862,28 @@ export type Mutation = {
   generateBackupCodes: BackupCodesPayload;
   /** Sign out a user */
   logout: Scalars['String']['output'];
+  /** Mark all notifications as read */
+  markAllNotificationsAsRead: Scalars['String']['output'];
+  /** Mark a notification as read */
+  markNotificationAsRead: Scalars['String']['output'];
+  /** Register a new webhook */
+  registerWebhook: Webhook;
   /** Resend email 2FA verification code */
   resendEmail2FACode: Scalars['String']['output'];
+  /** Resend verification email */
+  resendVerificationEmail: Scalars['String']['output'];
   /** Reset password with token */
   resetPassword: Scalars['String']['output'];
+  /** Revoke a specific active session */
+  revokeSession: Scalars['String']['output'];
   /** Sign in a user */
   signIn: AuthPayload;
   /** Sign up... */
   signUp?: Maybe<UserItem>;
   /** Sync a batch of file metadata into the database. */
   syncDriveFiles: Array<FileItem>;
+  /** Verify email with token */
+  verifyEmail: Scalars['String']['output'];
   /** Verify email 2FA code to enable email 2FA */
   verifyEmail2FACode: BackupCodesPayload;
   /** Verify TOTP setup and enable two-factor authentication */
@@ -851,13 +893,39 @@ export type Mutation = {
 };
 
 
+export type MutationDeleteWebhookArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
 export type MutationForgotPasswordArgs = {
   data: ForgotPasswordInput;
 };
 
 
+export type MutationMarkNotificationAsReadArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationRegisterWebhookArgs = {
+  events: Array<Scalars['String']['input']>;
+  url: Scalars['String']['input'];
+};
+
+
+export type MutationResendVerificationEmailArgs = {
+  email: Scalars['String']['input'];
+};
+
+
 export type MutationResetPasswordArgs = {
   data: ResetPasswordInput;
+};
+
+
+export type MutationRevokeSessionArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -876,6 +944,11 @@ export type MutationSyncDriveFilesArgs = {
 };
 
 
+export type MutationVerifyEmailArgs = {
+  token: Scalars['String']['input'];
+};
+
+
 export type MutationVerifyEmail2FaCodeArgs = {
   data: Scalars['String']['input'];
 };
@@ -890,6 +963,17 @@ export type MutationVerifyTwoFactorCodeArgs = {
   data: Scalars['String']['input'];
 };
 
+export type Notification = {
+  __typename?: 'Notification';
+  createdAt?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  isRead?: Maybe<Scalars['Boolean']['output']>;
+  link?: Maybe<Scalars['String']['output']>;
+  message: Scalars['String']['output'];
+  title: Scalars['String']['output'];
+  type: Scalars['String']['output'];
+};
+
 /** Order by direction */
 export enum OrderDirection {
   /** Ascending order */
@@ -900,13 +984,19 @@ export enum OrderDirection {
 
 export type Query = {
   __typename?: 'Query';
+  /** Get all active sessions for the current user */
+  activeSessions: Array<Session>;
   files: Array<FileSelectItem>;
   /** Get current authenticated user */
-  me?: Maybe<UserItem>;
+  me?: Maybe<User>;
+  /** Get notifications for the current user */
+  notifications: Array<Notification>;
   /** Get two-factor authentication status */
   twoFactorStatus: TwoFactorStatus;
   users: Array<UserSelectItem>;
   videoMetadata: Array<VideoMetadataSelectItem>;
+  /** Get all webhooks for the current user */
+  webhooks: Array<Webhook>;
 };
 
 
@@ -939,6 +1029,17 @@ export type ResetPasswordInput = {
   password: Scalars['String']['input'];
   /** Password reset token. */
   token: Scalars['String']['input'];
+};
+
+export type Session = {
+  __typename?: 'Session';
+  createdAt?: Maybe<Scalars['String']['output']>;
+  expiresAt?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  ipAddress?: Maybe<Scalars['String']['output']>;
+  lastActive?: Maybe<Scalars['String']['output']>;
+  location?: Maybe<Scalars['String']['output']>;
+  userAgent?: Maybe<Scalars['String']['output']>;
 };
 
 /** Input type for sign in */
@@ -983,12 +1084,42 @@ export type TotpSetupPayload = {
 /** Two-factor authentication status */
 export type TwoFactorStatus = {
   __typename?: 'TwoFactorStatus';
+  /** Whether email 2FA is enabled */
+  emailEnabled: Scalars['Boolean']['output'];
   /** Whether two-factor authentication is enabled */
   enabled: Scalars['Boolean']['output'];
   /** Whether backup codes are available */
   hasBackupCodes: Scalars['Boolean']['output'];
-  /** The two-factor authentication method */
+  /** The preferred two-factor authentication method */
   method?: Maybe<Scalars['String']['output']>;
+  /** Whether TOTP (authenticator app) is enabled */
+  totpEnabled: Scalars['Boolean']['output'];
+};
+
+/** User object */
+export type User = {
+  __typename?: 'User';
+  /** Date */
+  createdAt?: Maybe<Scalars['String']['output']>;
+  currentSessionId?: Maybe<Scalars['String']['output']>;
+  email: Scalars['String']['output'];
+  emailVerifiedAt?: Maybe<Scalars['String']['output']>;
+  /** Files owned by the user */
+  files: Array<Maybe<File>>;
+  firstName: Scalars['String']['output'];
+  id: Scalars['String']['output'];
+  lastName: Scalars['String']['output'];
+  password: Scalars['String']['output'];
+  phoneNumber?: Maybe<Scalars['String']['output']>;
+  /** JSON */
+  twoFactorBackupCodes?: Maybe<Scalars['String']['output']>;
+  twoFactorEmailEnabled: Scalars['Boolean']['output'];
+  twoFactorEnabled: Scalars['Boolean']['output'];
+  twoFactorMethod?: Maybe<UserTwoFactorMethodEnum>;
+  twoFactorSecret?: Maybe<Scalars['String']['output']>;
+  twoFactorTotpEnabled: Scalars['Boolean']['output'];
+  /** Date */
+  updatedAt?: Maybe<Scalars['String']['output']>;
 };
 
 export type UserCreatedAtFilters = {
@@ -1195,9 +1326,11 @@ export type UserFilesRelationUserRelation = {
   phoneNumber?: Maybe<Scalars['String']['output']>;
   /** JSON */
   twoFactorBackupCodes?: Maybe<Scalars['String']['output']>;
+  twoFactorEmailEnabled: Scalars['Boolean']['output'];
   twoFactorEnabled: Scalars['Boolean']['output'];
   twoFactorMethod?: Maybe<UserTwoFactorMethodEnum>;
   twoFactorSecret?: Maybe<Scalars['String']['output']>;
+  twoFactorTotpEnabled: Scalars['Boolean']['output'];
   /** Date */
   updatedAt?: Maybe<Scalars['String']['output']>;
 };
@@ -1245,9 +1378,11 @@ export type UserFilters = {
   password?: InputMaybe<UserPasswordFilters>;
   phoneNumber?: InputMaybe<UserPhoneNumberFilters>;
   twoFactorBackupCodes?: InputMaybe<UserTwoFactorBackupCodesFilters>;
+  twoFactorEmailEnabled?: InputMaybe<UserTwoFactorEmailEnabledFilters>;
   twoFactorEnabled?: InputMaybe<UserTwoFactorEnabledFilters>;
   twoFactorMethod?: InputMaybe<UserTwoFactorMethodFilters>;
   twoFactorSecret?: InputMaybe<UserTwoFactorSecretFilters>;
+  twoFactorTotpEnabled?: InputMaybe<UserTwoFactorTotpEnabledFilters>;
   updatedAt?: InputMaybe<UserUpdatedAtFilters>;
 };
 
@@ -1261,9 +1396,11 @@ export type UserFiltersOr = {
   password?: InputMaybe<UserPasswordFilters>;
   phoneNumber?: InputMaybe<UserPhoneNumberFilters>;
   twoFactorBackupCodes?: InputMaybe<UserTwoFactorBackupCodesFilters>;
+  twoFactorEmailEnabled?: InputMaybe<UserTwoFactorEmailEnabledFilters>;
   twoFactorEnabled?: InputMaybe<UserTwoFactorEnabledFilters>;
   twoFactorMethod?: InputMaybe<UserTwoFactorMethodFilters>;
   twoFactorSecret?: InputMaybe<UserTwoFactorSecretFilters>;
+  twoFactorTotpEnabled?: InputMaybe<UserTwoFactorTotpEnabledFilters>;
   updatedAt?: InputMaybe<UserUpdatedAtFilters>;
 };
 
@@ -1358,9 +1495,11 @@ export type UserItem = {
   phoneNumber?: Maybe<Scalars['String']['output']>;
   /** JSON */
   twoFactorBackupCodes?: Maybe<Scalars['String']['output']>;
+  twoFactorEmailEnabled: Scalars['Boolean']['output'];
   twoFactorEnabled: Scalars['Boolean']['output'];
   twoFactorMethod?: Maybe<UserTwoFactorMethodEnum>;
   twoFactorSecret?: Maybe<Scalars['String']['output']>;
+  twoFactorTotpEnabled: Scalars['Boolean']['output'];
   /** Date */
   updatedAt?: Maybe<Scalars['String']['output']>;
 };
@@ -1414,9 +1553,11 @@ export type UserOrderBy = {
   password?: InputMaybe<InnerOrder>;
   phoneNumber?: InputMaybe<InnerOrder>;
   twoFactorBackupCodes?: InputMaybe<InnerOrder>;
+  twoFactorEmailEnabled?: InputMaybe<InnerOrder>;
   twoFactorEnabled?: InputMaybe<InnerOrder>;
   twoFactorMethod?: InputMaybe<InnerOrder>;
   twoFactorSecret?: InputMaybe<InnerOrder>;
+  twoFactorTotpEnabled?: InputMaybe<InnerOrder>;
   updatedAt?: InputMaybe<InnerOrder>;
 };
 
@@ -1512,9 +1653,11 @@ export type UserSelectItem = {
   phoneNumber?: Maybe<Scalars['String']['output']>;
   /** JSON */
   twoFactorBackupCodes?: Maybe<Scalars['String']['output']>;
+  twoFactorEmailEnabled: Scalars['Boolean']['output'];
   twoFactorEnabled: Scalars['Boolean']['output'];
   twoFactorMethod?: Maybe<UserTwoFactorMethodEnum>;
   twoFactorSecret?: Maybe<Scalars['String']['output']>;
+  twoFactorTotpEnabled: Scalars['Boolean']['output'];
   /** Date */
   updatedAt?: Maybe<Scalars['String']['output']>;
 };
@@ -1575,6 +1718,45 @@ export type UserTwoFactorBackupCodesfiltersOr = {
   notIlike?: InputMaybe<Scalars['String']['input']>;
   /** Array<JSON> */
   notInArray?: InputMaybe<Array<Scalars['String']['input']>>;
+  notLike?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UserTwoFactorEmailEnabledFilters = {
+  OR?: InputMaybe<Array<UserTwoFactorEmailEnabledfiltersOr>>;
+  eq?: InputMaybe<Scalars['Boolean']['input']>;
+  gt?: InputMaybe<Scalars['Boolean']['input']>;
+  gte?: InputMaybe<Scalars['Boolean']['input']>;
+  ilike?: InputMaybe<Scalars['String']['input']>;
+  /** Array<undefined> */
+  inArray?: InputMaybe<Array<Scalars['Boolean']['input']>>;
+  isNotNull?: InputMaybe<Scalars['Boolean']['input']>;
+  isNull?: InputMaybe<Scalars['Boolean']['input']>;
+  like?: InputMaybe<Scalars['String']['input']>;
+  lt?: InputMaybe<Scalars['Boolean']['input']>;
+  lte?: InputMaybe<Scalars['Boolean']['input']>;
+  ne?: InputMaybe<Scalars['Boolean']['input']>;
+  notIlike?: InputMaybe<Scalars['String']['input']>;
+  /** Array<undefined> */
+  notInArray?: InputMaybe<Array<Scalars['Boolean']['input']>>;
+  notLike?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UserTwoFactorEmailEnabledfiltersOr = {
+  eq?: InputMaybe<Scalars['Boolean']['input']>;
+  gt?: InputMaybe<Scalars['Boolean']['input']>;
+  gte?: InputMaybe<Scalars['Boolean']['input']>;
+  ilike?: InputMaybe<Scalars['String']['input']>;
+  /** Array<undefined> */
+  inArray?: InputMaybe<Array<Scalars['Boolean']['input']>>;
+  isNotNull?: InputMaybe<Scalars['Boolean']['input']>;
+  isNull?: InputMaybe<Scalars['Boolean']['input']>;
+  like?: InputMaybe<Scalars['String']['input']>;
+  lt?: InputMaybe<Scalars['Boolean']['input']>;
+  lte?: InputMaybe<Scalars['Boolean']['input']>;
+  ne?: InputMaybe<Scalars['Boolean']['input']>;
+  notIlike?: InputMaybe<Scalars['String']['input']>;
+  /** Array<undefined> */
+  notInArray?: InputMaybe<Array<Scalars['Boolean']['input']>>;
   notLike?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -1699,6 +1881,45 @@ export type UserTwoFactorSecretfiltersOr = {
   notIlike?: InputMaybe<Scalars['String']['input']>;
   /** Array<undefined> */
   notInArray?: InputMaybe<Array<Scalars['String']['input']>>;
+  notLike?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UserTwoFactorTotpEnabledFilters = {
+  OR?: InputMaybe<Array<UserTwoFactorTotpEnabledfiltersOr>>;
+  eq?: InputMaybe<Scalars['Boolean']['input']>;
+  gt?: InputMaybe<Scalars['Boolean']['input']>;
+  gte?: InputMaybe<Scalars['Boolean']['input']>;
+  ilike?: InputMaybe<Scalars['String']['input']>;
+  /** Array<undefined> */
+  inArray?: InputMaybe<Array<Scalars['Boolean']['input']>>;
+  isNotNull?: InputMaybe<Scalars['Boolean']['input']>;
+  isNull?: InputMaybe<Scalars['Boolean']['input']>;
+  like?: InputMaybe<Scalars['String']['input']>;
+  lt?: InputMaybe<Scalars['Boolean']['input']>;
+  lte?: InputMaybe<Scalars['Boolean']['input']>;
+  ne?: InputMaybe<Scalars['Boolean']['input']>;
+  notIlike?: InputMaybe<Scalars['String']['input']>;
+  /** Array<undefined> */
+  notInArray?: InputMaybe<Array<Scalars['Boolean']['input']>>;
+  notLike?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UserTwoFactorTotpEnabledfiltersOr = {
+  eq?: InputMaybe<Scalars['Boolean']['input']>;
+  gt?: InputMaybe<Scalars['Boolean']['input']>;
+  gte?: InputMaybe<Scalars['Boolean']['input']>;
+  ilike?: InputMaybe<Scalars['String']['input']>;
+  /** Array<undefined> */
+  inArray?: InputMaybe<Array<Scalars['Boolean']['input']>>;
+  isNotNull?: InputMaybe<Scalars['Boolean']['input']>;
+  isNull?: InputMaybe<Scalars['Boolean']['input']>;
+  like?: InputMaybe<Scalars['String']['input']>;
+  lt?: InputMaybe<Scalars['Boolean']['input']>;
+  lte?: InputMaybe<Scalars['Boolean']['input']>;
+  ne?: InputMaybe<Scalars['Boolean']['input']>;
+  notIlike?: InputMaybe<Scalars['String']['input']>;
+  /** Array<undefined> */
+  notInArray?: InputMaybe<Array<Scalars['Boolean']['input']>>;
   notLike?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -1946,9 +2167,11 @@ export type VideoMetadataFileRelationUserRelation = {
   phoneNumber?: Maybe<Scalars['String']['output']>;
   /** JSON */
   twoFactorBackupCodes?: Maybe<Scalars['String']['output']>;
+  twoFactorEmailEnabled: Scalars['Boolean']['output'];
   twoFactorEnabled: Scalars['Boolean']['output'];
   twoFactorMethod?: Maybe<UserTwoFactorMethodEnum>;
   twoFactorSecret?: Maybe<Scalars['String']['output']>;
+  twoFactorTotpEnabled: Scalars['Boolean']['output'];
   /** Date */
   updatedAt?: Maybe<Scalars['String']['output']>;
 };
@@ -2191,6 +2414,16 @@ export type VideoMetadataWidthfiltersOr = {
   notLike?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type Webhook = {
+  __typename?: 'Webhook';
+  createdAt?: Maybe<Scalars['String']['output']>;
+  events?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
+  id: Scalars['ID']['output'];
+  isActive?: Maybe<Scalars['Boolean']['output']>;
+  secret: Scalars['String']['output'];
+  url: Scalars['String']['output'];
+};
+
 export type UserSelectItemFragment = { __typename?: 'UserSelectItem', id: string, email: string, lastName: string, firstName: string };
 
 export type UserItemFragment = { __typename?: 'UserItem', id: string, email: string, lastName: string, firstName: string };
@@ -2205,7 +2438,7 @@ export type UsersQuery = { __typename?: 'Query', users: Array<{ __typename?: 'Us
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'UserItem', id: string, email: string, lastName: string, firstName: string, twoFactorEnabled: boolean, twoFactorMethod?: UserTwoFactorMethodEnum | null } | null };
+export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'User', id: string, email: string, lastName: string, firstName: string, twoFactorEnabled: boolean, twoFactorMethod?: UserTwoFactorMethodEnum | null, currentSessionId?: string | null } | null };
 
 export type SignUpMutationVariables = Exact<{
   data: SignUpInput;
@@ -2219,7 +2452,7 @@ export type SignInMutationVariables = Exact<{
 }>;
 
 
-export type SignInMutation = { __typename?: 'Mutation', signIn: { __typename?: 'AuthPayload', sessionId?: string | null, requiresTwoFactor?: boolean | null, twoFactorMethod?: string | null, user?: { __typename?: 'UserItem', id: string, email: string, lastName: string, firstName: string } | null } };
+export type SignInMutation = { __typename?: 'Mutation', signIn: { __typename?: 'AuthPayload', sessionId?: string | null, requiresTwoFactor?: boolean | null, twoFactorMethod?: string | null, totpEnabled?: boolean | null, emailEnabled?: boolean | null, user?: { __typename?: 'UserItem', id: string, email: string, lastName: string, firstName: string } | null } };
 
 export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -2257,6 +2490,16 @@ export type DisableTwoFactorMutationVariables = Exact<{ [key: string]: never; }>
 
 export type DisableTwoFactorMutation = { __typename?: 'Mutation', disableTwoFactor: string };
 
+export type DisableTotpMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type DisableTotpMutation = { __typename?: 'Mutation', disableTOTP: string };
+
+export type DisableEmail2FaMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type DisableEmail2FaMutation = { __typename?: 'Mutation', disableEmail2FA: string };
+
 export type VerifyTwoFactorCodeMutationVariables = Exact<{
   data: Scalars['String']['input'];
 }>;
@@ -2289,7 +2532,75 @@ export type ResendEmail2FaCodeMutation = { __typename?: 'Mutation', resendEmail2
 export type TwoFactorStatusQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type TwoFactorStatusQuery = { __typename?: 'Query', twoFactorStatus: { __typename?: 'TwoFactorStatus', enabled: boolean, method?: string | null, hasBackupCodes: boolean } };
+export type TwoFactorStatusQuery = { __typename?: 'Query', twoFactorStatus: { __typename?: 'TwoFactorStatus', enabled: boolean, method?: string | null, totpEnabled: boolean, emailEnabled: boolean, hasBackupCodes: boolean } };
+
+export type ActiveSessionsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type ActiveSessionsQuery = { __typename?: 'Query', activeSessions: Array<{ __typename?: 'Session', id: string, ipAddress?: string | null, userAgent?: string | null, location?: string | null, lastActive?: string | null, createdAt?: string | null, expiresAt?: string | null }> };
+
+export type RevokeSessionMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type RevokeSessionMutation = { __typename?: 'Mutation', revokeSession: string };
+
+export type WebhooksQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type WebhooksQuery = { __typename?: 'Query', webhooks: Array<{ __typename?: 'Webhook', id: string, url: string, secret: string, isActive?: boolean | null, events?: Array<string | null> | null, createdAt?: string | null }> };
+
+export type RegisterWebhookMutationVariables = Exact<{
+  url: Scalars['String']['input'];
+  events: Array<Scalars['String']['input']> | Scalars['String']['input'];
+}>;
+
+
+export type RegisterWebhookMutation = { __typename?: 'Mutation', registerWebhook: { __typename?: 'Webhook', id: string, url: string, secret: string, isActive?: boolean | null, events?: Array<string | null> | null, createdAt?: string | null } };
+
+export type DeleteWebhookMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteWebhookMutation = { __typename?: 'Mutation', deleteWebhook: string };
+
+export type FilesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type FilesQuery = { __typename?: 'Query', files: Array<{ __typename?: 'FileSelectItem', id: string, filename: string, mimetype?: string | null, sizeBytes?: number | null, storageType: FileStorageTypeEnum, createdAt?: string | null }> };
+
+export type NotificationsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type NotificationsQuery = { __typename?: 'Query', notifications: Array<{ __typename?: 'Notification', id: string, title: string, message: string, type: string, isRead?: boolean | null, link?: string | null, createdAt?: string | null }> };
+
+export type MarkNotificationAsReadMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type MarkNotificationAsReadMutation = { __typename?: 'Mutation', markNotificationAsRead: string };
+
+export type MarkAllNotificationsAsReadMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MarkAllNotificationsAsReadMutation = { __typename?: 'Mutation', markAllNotificationsAsRead: string };
+
+export type ResendVerificationEmailMutationVariables = Exact<{
+  email: Scalars['String']['input'];
+}>;
+
+
+export type ResendVerificationEmailMutation = { __typename?: 'Mutation', resendVerificationEmail: string };
+
+export type VerifyEmailMutationVariables = Exact<{
+  token: Scalars['String']['input'];
+}>;
+
+
+export type VerifyEmailMutation = { __typename?: 'Mutation', verifyEmail: string };
 
 export const UserSelectItemFragmentDoc = gql`
     fragment UserSelectItem on UserSelectItem {
@@ -2344,6 +2655,7 @@ export const MeDocument = gql`
     firstName
     twoFactorEnabled
     twoFactorMethod
+    currentSessionId
   }
 }
     `;
@@ -2391,6 +2703,8 @@ export const SignInDocument = gql`
     sessionId
     requiresTwoFactor
     twoFactorMethod
+    totpEnabled
+    emailEnabled
   }
 }
     `;
@@ -2507,6 +2821,38 @@ export const DisableTwoFactorDocument = gql`
       super(apollo);
     }
   }
+export const DisableTotpDocument = gql`
+    mutation DisableTOTP {
+  disableTOTP
+}
+    `;
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class DisableTotpGQL extends Apollo.Mutation<DisableTotpMutation, DisableTotpMutationVariables> {
+    document = DisableTotpDocument;
+    
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
+export const DisableEmail2FaDocument = gql`
+    mutation DisableEmail2FA {
+  disableEmail2FA
+}
+    `;
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class DisableEmail2FaGQL extends Apollo.Mutation<DisableEmail2FaMutation, DisableEmail2FaMutationVariables> {
+    document = DisableEmail2FaDocument;
+    
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
 export const VerifyTwoFactorCodeDocument = gql`
     mutation VerifyTwoFactorCode($data: String!) {
   verifyTwoFactorCode(data: $data)
@@ -2596,6 +2942,8 @@ export const TwoFactorStatusDocument = gql`
   twoFactorStatus {
     enabled
     method
+    totpEnabled
+    emailEnabled
     hasBackupCodes
   }
 }
@@ -2606,6 +2954,219 @@ export const TwoFactorStatusDocument = gql`
   })
   export class TwoFactorStatusGQL extends Apollo.Query<TwoFactorStatusQuery, TwoFactorStatusQueryVariables> {
     document = TwoFactorStatusDocument;
+    
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
+export const ActiveSessionsDocument = gql`
+    query ActiveSessions {
+  activeSessions {
+    id
+    ipAddress
+    userAgent
+    location
+    lastActive
+    createdAt
+    expiresAt
+  }
+}
+    `;
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class ActiveSessionsGQL extends Apollo.Query<ActiveSessionsQuery, ActiveSessionsQueryVariables> {
+    document = ActiveSessionsDocument;
+    
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
+export const RevokeSessionDocument = gql`
+    mutation RevokeSession($id: ID!) {
+  revokeSession(id: $id)
+}
+    `;
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class RevokeSessionGQL extends Apollo.Mutation<RevokeSessionMutation, RevokeSessionMutationVariables> {
+    document = RevokeSessionDocument;
+    
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
+export const WebhooksDocument = gql`
+    query Webhooks {
+  webhooks {
+    id
+    url
+    secret
+    isActive
+    events
+    createdAt
+  }
+}
+    `;
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class WebhooksGQL extends Apollo.Query<WebhooksQuery, WebhooksQueryVariables> {
+    document = WebhooksDocument;
+    
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
+export const RegisterWebhookDocument = gql`
+    mutation RegisterWebhook($url: String!, $events: [String!]!) {
+  registerWebhook(url: $url, events: $events) {
+    id
+    url
+    secret
+    isActive
+    events
+    createdAt
+  }
+}
+    `;
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class RegisterWebhookGQL extends Apollo.Mutation<RegisterWebhookMutation, RegisterWebhookMutationVariables> {
+    document = RegisterWebhookDocument;
+    
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
+export const DeleteWebhookDocument = gql`
+    mutation DeleteWebhook($id: ID!) {
+  deleteWebhook(id: $id)
+}
+    `;
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class DeleteWebhookGQL extends Apollo.Mutation<DeleteWebhookMutation, DeleteWebhookMutationVariables> {
+    document = DeleteWebhookDocument;
+    
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
+export const FilesDocument = gql`
+    query Files {
+  files {
+    id
+    filename
+    mimetype
+    sizeBytes
+    storageType
+    createdAt
+  }
+}
+    `;
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class FilesGQL extends Apollo.Query<FilesQuery, FilesQueryVariables> {
+    document = FilesDocument;
+    
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
+export const NotificationsDocument = gql`
+    query Notifications {
+  notifications {
+    id
+    title
+    message
+    type
+    isRead
+    link
+    createdAt
+  }
+}
+    `;
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class NotificationsGQL extends Apollo.Query<NotificationsQuery, NotificationsQueryVariables> {
+    document = NotificationsDocument;
+    
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
+export const MarkNotificationAsReadDocument = gql`
+    mutation MarkNotificationAsRead($id: ID!) {
+  markNotificationAsRead(id: $id)
+}
+    `;
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class MarkNotificationAsReadGQL extends Apollo.Mutation<MarkNotificationAsReadMutation, MarkNotificationAsReadMutationVariables> {
+    document = MarkNotificationAsReadDocument;
+    
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
+export const MarkAllNotificationsAsReadDocument = gql`
+    mutation MarkAllNotificationsAsRead {
+  markAllNotificationsAsRead
+}
+    `;
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class MarkAllNotificationsAsReadGQL extends Apollo.Mutation<MarkAllNotificationsAsReadMutation, MarkAllNotificationsAsReadMutationVariables> {
+    document = MarkAllNotificationsAsReadDocument;
+    
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
+export const ResendVerificationEmailDocument = gql`
+    mutation ResendVerificationEmail($email: String!) {
+  resendVerificationEmail(email: $email)
+}
+    `;
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class ResendVerificationEmailGQL extends Apollo.Mutation<ResendVerificationEmailMutation, ResendVerificationEmailMutationVariables> {
+    document = ResendVerificationEmailDocument;
+    
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
+export const VerifyEmailDocument = gql`
+    mutation VerifyEmail($token: String!) {
+  verifyEmail(token: $token)
+}
+    `;
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class VerifyEmailGQL extends Apollo.Mutation<VerifyEmailMutation, VerifyEmailMutationVariables> {
+    document = VerifyEmailDocument;
     
     constructor(apollo: Apollo.Apollo) {
       super(apollo);

@@ -6,7 +6,8 @@ export const environment = {
 
     // worker
     apiUrl: 'http://localhost:7979',
-    schemaUrl: 'http://localhost:7979/graphql'
+    schemaUrl: 'http://localhost:7979/graphql',
+    r2PublicUrl: 'https://pub-82f31a38c5584c9f9e8dc7a5c90e568a.r2.dev'
 
     // apiUrl: 'https://graphql-prod.nguyenbinh23011998.workers.dev/app',
     // schemaUrl: 'https://graphql-prod.nguyenbinh23011998.workers.dev/app/graphql'

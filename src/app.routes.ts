@@ -6,7 +6,9 @@ import { Landing } from '@/app/pages/landing/landing';
 import { Notfound } from '@/app/pages/notfound/notfound';
 import { Settings } from '@/app/pages/settings/settings';
 import { authGuard } from '@/app/services/auth.guard';
- 
+
+import { Files } from '@/app/pages/files/files';
+
 export const appRoutes: Routes = [
     {
         path: '',
@@ -14,7 +16,7 @@ export const appRoutes: Routes = [
         canActivate: [authGuard],
         children: [
             { path: '', component: Dashboard },
-            { path: 'files', component: Dashboard },
+            { path: 'files', component: Files },
             { path: 'settings', component: Settings },
             { path: 'uikit', loadChildren: () => import('./app/pages/uikit/uikit.routes') },
             { path: 'documentation', component: Documentation },
